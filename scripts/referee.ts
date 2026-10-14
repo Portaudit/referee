@@ -320,12 +320,12 @@ async function main() {
     const refund = tr ? key(tr.data, 104) : address(envOr("REFUND_TO", wallet.address));
     console.log(`trade registration: ${tr ? "exists" : "NONE (an unregistered trade is expected to be refused)"}`);
     const i = ix("settle", [
-      [AUTH, W], [CONFIG, R], [d.swap, W], [d.trade, W], [d.credA, R], [d.credB, R], [refund, W],
+      [AUTH, W], [CONFIG, R], [d.swap, W], [d.trade, W], [d.credA, R], [d.credB, R], [refund, W], [SYS, R],
       [d.mintA, R], [d.mintB, R], [d.dvpAtaA, W], [d.dvpAtaB, W],
       [d.aB, W], [d.bA, W], [d.aA, W], [d.bB, W],
       [TOKEN, R], [TOKEN, R], [MEMO, R], [DVP, R],
     ]);
-    show("settle", i, ["authority_pda", "config", "swap_dvp", "trade", "credential_a", "credential_b", "refund_to",
+    show("settle", i, ["authority_pda", "config", "swap_dvp", "trade", "credential_a", "credential_b", "refund_to", "system_program",
       "mint_a", "mint_b", "dvp_ata_a", "dvp_ata_b", "user_a_destination_ata_b", "user_b_destination_ata_a",
       "user_a_ata_a", "user_b_ata_b", "token_program_a", "token_program_b", "memo_program", "dvp_program"]);
     await run("settle", [i], wallet);

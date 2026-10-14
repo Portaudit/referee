@@ -195,7 +195,21 @@ pub mod referee_stub {
         infos.extend(rest.iter().cloned());
 
         msg!("referee: settling trade {}", swap_info.key);
+        let before = pda_info.lamports();
         invoke_signed(&ix, &infos, &[signer_seeds])?;
+        // DvP sweeps all closed-account rent to its authority (this PDA). Return exactly that to refund_to.
+        let gained = pda_info.lamports().saturating_sub(before);
+        if gained > 0 {
+            let cpi = anchor_lang::system_program::Transfer {
+                from: pda_info.clone(),
+                to: ctx.accounts.refund_to.to_account_info(),
+            };
+            anchor_lang::system_program::transfer(
+                CpiContext::new_with_signer(anchor_lang::system_program::ID, cpi, &[signer_seeds]),
+                gained,
+            )?;
+        }
+        msg!("referee: returned {} lamports of rent to {}", gained, ctx.accounts.refund_to.key());
         Ok(())
     }
 }
@@ -301,6 +315,7 @@ pub struct Settle<'info> {
     /// CHECK: receives the trade registration rent; must equal the address both parties signed.
     #[account(mut, address = trade.refund_to)]
     pub refund_to: UncheckedAccount<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[account]

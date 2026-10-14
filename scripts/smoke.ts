@@ -1,3 +1,6 @@
+// Copyright 2026 Ishvir Jackpersad
+// SPDX-License-Identifier: Apache-2.0
+
 import * as dvp from "../dvp/index";
 
 const names = Object.keys(dvp).filter((k) =>

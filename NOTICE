@@ -1,0 +1,7 @@
+REFEREE
+Copyright 2026 Ishvir Jackpersad
+
+This product includes software developed by Ishvir Jackpersad.
+
+The dvp/ directory contains a generated TypeScript client for the Solana
+Foundation's DvP program, copied under the MIT licence. See dvp/LICENSE.

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Referee: replay of real devnet transactions</title>
+<style>
+:root{--bg:#0b0f14;--card:#121923;--line:#223042;--text:#e6edf3;--mute:#8b9bb0;--ok:#3ddc97;--bad:#ff6b6b;--acc:#7aa2ff;--acc2:#b58cff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header,main,footer{max-width:1100px;margin:0 auto;padding:0 20px}
+header{padding-top:28px}
+h1{margin:0;font-size:30px;letter-spacing:.3px}
+h2{margin:6px 0 0;font-size:19px}
+.sub{color:var(--mute);margin-top:6px}
+.banner{margin-top:14px;padding:10px 14px;border:1px solid var(--line);border-left:4px solid var(--acc2);border-radius:10px;background:#101722;color:var(--mute);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:16px 0}
+svg text{fill:var(--text);font:12px system-ui,sans-serif}
+svg .mut{fill:var(--mute)}
+.node rect{fill:#0f1620;stroke:var(--line);stroke-width:1.5;transition:all .35s}
+.node.on rect{stroke:var(--acc);fill:#142033;filter:drop-shadow(0 0 8px rgba(122,162,255,.55))}
+#box-ref,#box-dvp{fill:none;stroke:var(--line);stroke-width:1.5;transition:all .35s}
+#box-ref.on{stroke:var(--acc)}
+.edge{stroke:var(--line);stroke-width:1.6;fill:none;marker-end:url(#arr);transition:all .35s}
+.edge.on{stroke:var(--acc2);stroke-width:2.6;stroke-dasharray:6 4;animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-20}}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab,button.play{background:#0f1620;border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;font:inherit}
+.tab.sel{border-color:var(--acc);background:#142033}
+button.play{border-color:var(--acc2);margin-top:10px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+td,th{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.sig{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--acc);word-break:break-all;margin-bottom:4px}
+.pill{padding:2px 9px;border-radius:99px;font-size:12px;background:#1a2433;color:var(--mute);white-space:nowrap}
+.pill.ok{background:rgba(61,220,151,.15);color:var(--ok)}
+.pill.bad{background:rgba(255,107,107,.15);color:var(--bad)}
+button.c{background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:2px 8px;cursor:pointer;font-size:12px}
+a{color:var(--acc)}
+.ev{color:var(--acc2);font:12px ui-monospace,Menlo,Consolas,monospace;margin-top:4px}
+.mutd{color:var(--mute);font-size:13px}
+footer{color:var(--mute);font-size:13px;padding-bottom:50px}
+.claims{padding-left:20px}.claims li{margin:8px 0}.claims a{color:var(--text);text-decoration:none;border-bottom:1px dotted var(--mute)}
+@media (max-width:700px){td:nth-child(4),th:nth-child(4){display:none}}
+</style></head><body>
+<header>
+<h1>Referee</h1>
+<div class="sub">An independent settlement authority for Solana DvP trades. Built by Ishvir Jackpersad.</div>
+<div class="banner"><b>This is a replay</b> of transactions recorded on Solana devnet on 14 October 2026 (UTC). Nothing here is live. Every row carries a signature you can check yourself with <code>solana confirm -v &lt;signature&gt; --url devnet</code>. Unaudited. Independent project, not affiliated with or endorsed by the Solana Foundation or J.P. Morgan.</div>
+</header>
+<main>
+<div class="card">
+<svg viewBox="0 0 920 400" width="100%" role="img" aria-label="Architecture of Referee">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8b9bb0"/></marker></defs>
+<text x="20" y="16" class="mut">OFF CHAIN</text>
+<text x="300" y="16" class="mut">ON CHAIN (Solana devnet)</text>
+<g class="node" id="n-parties"><rect x="20" y="40" width="170" height="70" rx="10"/><text x="105" y="70" text-anchor="middle">Parties A and B</text><text x="105" y="90" text-anchor="middle" class="mut">co-sign the exact terms</text></g>
+<g class="node" id="n-issuer"><rect x="20" y="160" width="170" height="70" rx="10"/><text x="105" y="190" text-anchor="middle">Demo issuer</text><text x="105" y="210" text-anchor="middle" class="mut">attests eligibility</text></g>
+<g class="node" id="n-keeper"><rect x="20" y="280" width="170" height="70" rx="10"/><text x="105" y="310" text-anchor="middle">Anyone / keeper</text><text x="105" y="330" text-anchor="middle" class="mut">pays the fee, needs no authority</text></g>
+<rect id="box-ref" x="300" y="26" width="330" height="350" rx="14"/>
+<text x="465" y="48" text-anchor="middle">REFEREE program</text>
+<g class="node" id="n-config"><rect x="320" y="62" width="290" height="50" rx="8"/><text x="465" y="92" text-anchor="middle">config: admin and issuer</text></g>
+<g class="node" id="n-cred"><rect x="320" y="126" width="290" height="50" rx="8"/><text x="465" y="156" text-anchor="middle">credential PDAs: eligible flag and expiry</text></g>
+<g class="node" id="n-trade"><rect x="320" y="190" width="290" height="50" rx="8"/><text x="465" y="220" text-anchor="middle">trade registry: terms and refund address</text></g>
+<g class="node" id="n-pda"><rect x="320" y="254" width="290" height="60" rx="8"/><text x="465" y="280" text-anchor="middle">authority PDA</text><text x="465" y="298" text-anchor="middle" class="mut">signs DvP SettleDvp via invoke_signed</text></g>
+<text x="465" y="346" text-anchor="middle" class="mut">settle: anyone may call it; needs registry and two credentials</text>
+<rect id="box-dvp" x="730" y="110" width="170" height="190" rx="14"/>
+<text x="815" y="134" text-anchor="middle">DvP program</text>
+<text x="815" y="150" text-anchor="middle" class="mut">Solana Foundation, unmodified</text>
+<g class="node" id="n-dvp"><rect x="745" y="165" width="140" height="110" rx="8"/><text x="815" y="208" text-anchor="middle">trade record</text><text x="815" y="226" text-anchor="middle">and two escrows</text><text x="815" y="248" text-anchor="middle" class="mut">rent swept to authority</text></g>
+<path class="edge" id="e-parties" d="M190 75 C255 75 270 215 318 215"/>
+<path class="edge" id="e-issuer" d="M190 195 C255 195 270 151 318 151"/>
+<path class="edge" id="e-keeper" d="M190 315 C255 315 270 284 318 284"/>
+<path class="edge" id="e-pda" d="M612 284 C675 284 690 220 743 220"/>
+</svg>
+</div>
+<div class="card">
+<h2>What these transactions prove</h2>
+<ul class="claims">
+<li><a href="#" data-go="core claim">A program-derived address can be the settlement authority of a Solana Foundation DvP trade, and it settled one on devnet.</a></li>
+<li><a href="#" data-go="refusals">Unregistered trades, revoked credentials and early close attempts are refused on chain.</a></li>
+<li><a href="#" data-go="registered">Registered, credentialed trades settle, and the rent DvP sweeps is returned to the address the parties chose.</a></li>
+<li><a href="#" data-go="anyone">Anyone can trigger settlement: a fresh key did, and a keeper script found a trade by itself.</a></li>
+<li><a href="#" data-go="unwinding">A rejected trade's registration can be closed and its rent returned.</a></li>
+</ul>
+<div class="mutd">Devnet only, unaudited. The demo issuer is a keypair controlled by the author, so credentials are a demonstration and not KYC.</div>
+</div>
+<div class="card">
+<div class="tabs" id="tabs"></div>
+<div id="scene"></div>
+<button class="play" id="play">Play this scene</button>
+</div>
+<div class="card">
+<h2>Full timeline</h2>
+<div class="mutd" id="tlnote"></div>
+<div id="timeline"></div>
+</div>
+</main>
+<footer>Generated from docs/RECEIPTS.md and an on-chain ledger of the program's transactions (built 2026-10-14 16:24 UTC). Source: github.com/Portaudit/referee</footer>
+<script>
+const D={"scenes": [{"title": "The program and its upgrades", "rows": [{"label": "Stub deployed", "detail": "A first, minimal program (152,160 bytes)", "sig": "39CPt6shRKxRBFPwWUeCT4Mj9BLGq4n2HoLB4rXiUqs41JtjMGLkb6ZGno1vLfVBJVr1GvJFZJj4tSD6yGks79UL"}, {"label": "Upgrade 1", "detail": "Registry, credentials and gated settle replace the stub (215,176 bytes)", "sig": "4ispfRHSCsUQxSbek8tkfC7EX9Jxqdaj5qoY5VaZuuDGatpepeX54xdte3qTsrHqq2b47P1KW5FRacTxQ63X4JQL"}, {"label": "Upgrade 2", "detail": "Settle returns the rent DvP sweeps (216,288 bytes)", "sig": "5WtT9xPZduEtfQeHp5bG2g3Hy4a1EmoF4ZuFNve5Ss5oc5yut2KMoemNrp9F13Z8pcnVdtNik4rZz8Rm92Vm41Jq"}, {"label": "Upgrade 3", "detail": "Events and close_trade (227,496 bytes)", "sig": "2P47GeeeoggaTebnPHDsqJkYxeaVL1NcsDvMKKhPitoTdP9qDR3tq1Mcn17h73tAqYNLazws52tAfFBDxCHkQXnH"}]}, {"title": "The core claim: a program-derived address settles a DvP trade", "rows": [{"label": "The stub's PDA settles a funded DvP trade (first proof)", "detail": "", "sig": "2KZbaS3xcQ7AygZVYNzJYfYWfd8R6PJeZjn2b2xTNib8mRHmY5KNJ3LktJAaJYQn6zosZZNxsqxovT8vNNcTfYoK"}]}, {"title": "Setup", "rows": [{"label": "Config created", "detail": "", "sig": "CysbAL2ppz8Bv2PFzN4edAjmWd89WRz56MVPnFSMeBivD8d3SbB1TcGnEq12ZPCchMW47atFKKcNrsswDLqYkFP"}, {"label": "Credential issued to party A", "detail": "", "sig": "2XDS5xNWH4tbUBcCsSJhWAFnTfiifFze1etenPFv2HzVLCuzCb7ALAvLpqQHZxC8qACnAfjTzQTZT4aySAqVXxh7"}, {"label": "Credential issued to party B", "detail": "", "sig": "2SzAXDQqiFDNSeDsgWuhdj59FVtQ1RBYmDbWakMCBYGrEtoXshFExe2pUdY5dqsZt6DWRgjznnePNpmDGtcN5XHY"}]}, {"title": "Refusals (failed transactions kept on chain)", "rows": [{"label": "Settle a trade nobody registered", "detail": "AccountNotInitialized (3012)", "sig": "5o35xSWPBD3UwbqPR3Mv9DzB6UwzKDgFbPMUeaCEr93WG3r5hpjges2QxnbeEQys2j35xmCbdDtB4qZqWfvir6Nt"}, {"label": "Settle after a credential was revoked", "detail": "CredentialNotEligible (6012)", "sig": "33vzuzwjHSkZboQXgEF1viwdfxtjoprzsFFx16K1ATwJMbKpPafyA1wWHmNNbQcTahL8fhLx3K1jiPdJrCuKfkYc"}, {"label": "Close a registration while the DvP trade is still open", "detail": "TradeStillOpen (6016)", "sig": "2zePt15vxgicy8T6SCJsHTKwJD851ZAUDbxG4fz7c5nHZnUzABB871jhVucaiydTs7vRqbH8cmx3FtDkx8MmERPa"}]}, {"title": "Registered, credentialed trades settle", "rows": [{"label": "Register (trade 1005)", "detail": "", "sig": "4tDYgMoBKW8ABaaLyArQNMxDUNEFqPeJEQiDnQFJDsJnVUNrAqz2uLSQzUu17h79dRcfQ5QfCkhn9gswpBWjX3na"}, {"label": "Settle (trade 1005)", "detail": "", "sig": "5MUcDHFsGo5kb46NHjixqJ4PX9wbGFAi4ib2LoFc7Wc1RD28QAfVtHw28AVQUzacPqo8GQ7ief65Wry7Q2fEEHLe"}, {"label": "Register (trade 1006)", "detail": "", "sig": "4W9yeLMzBvCu8FmzL2FJmASyds4forHqx7igBC62mK3XtJyCaX7mGNQUAwFvnfpyvpJ1THvdRN75kuX41DVx7ec8"}, {"label": "Settle, rent returned to the chosen address (trade 1006)", "detail": "", "sig": "3oShWDTisvoxHp5r72E61xVzDRJb6zdNctRoyXWJpMHg5MxRLYJHHpJBp2KEWAAnGco2e9qgHEie5sKHf3kCmCaD"}, {"label": "Credential revoked", "detail": "", "sig": "2AJyPXqwQb2x4xktt2jZmSgjWjZD9ghsQ4zLumme4T5EhmpHUzV41j55U8QNbHvNX92obq7CycrTTXWRaoeekiPS"}, {"label": "Credential renewed", "detail": "", "sig": "5QWgS1vvzVFF2ZiJTzq7kEpbj3DBSsoPVqrDE9oYrkfUumHTk2CgcTn4a7zTwmg6LQkjscrVRb8Cbr1scTymjcDS"}, {"label": "Settle after renewal (trade 1007)", "detail": "", "sig": "JXEVRbCdeyqRWMSQVakSCd7Dhf1D5fTVhj32JpTc8ujfBhSX3pR4LSMGUxPhdoKcHjAwdncQ2E7pY1CvaUirX9k"}, {"label": "Settle with a TradeSettled event (trade 1009)", "detail": "", "sig": "38tTcya12Dig9Th8nP9YGnwFo1nx3mnDvKJ46djqcNwoRgGpTYUU6Zkw6fAMjuhd4rbW46kviQCB1H7xENVMM4cG"}]}, {"title": "Anyone can settle", "rows": [{"label": "Trade 1010 settled with a fresh key as the only signer and fee payer (H2rEU3uLgNPqZcAFwZ6WbyxR51uq9n6dk3ReWMxvDdg5)", "detail": "", "sig": "5i15Zt2RC69h7nApeu6NcT1vBsWK46JnQaLkUVTFmhr4nbU8ELDG7MgXu1PNyUX7VVHPyk9VJzzBwjJmbdGaUJTK"}, {"label": "Trade 1011 settled by the keeper script, which found the trade by itself", "detail": "", "sig": "3QvEpzWQxhSQoZ3aQu93ryFVb7eiXEiKKSixBqMa6PELeArh46Un61oZM5Am5WjW2nAW9xS9gNJAJqi7jai5huwR"}]}, {"title": "Unwinding a trade", "rows": [{"label": "A party rejects through DvP (trade 1008)", "detail": "", "sig": "3XS1DSx4xehvaDEkY8LrimxbrGkPb1GQGCJicK3gtqQoT2CrwqnwG1caPDGZNFYTBproRAjGu2bQZC3nW4zJUaKb"}, {"label": "close_trade returns the registration rent (trade 1008)", "detail": "", "sig": "3Nh5MzuAK9TghTSnSJFYs5MXaeHXcUqtuwvES67GMDMKWc56oB8Uhp2xxBXEmUFwvEmSREZtVgWDvixNeHzhNZ3s"}]}], "ledger": [{"time": "2026-10-14T11:29:51.000Z", "slot": "510972173", "signature": "39CPt6shRKxRBFPwWUeCT4Mj9BLGq4n2HoLB4rXiUqs41JtjMGLkb6ZGno1vLfVBJVr1GvJFZJj4tSD6yGks79UL", "instruction": "(none)", "status": "ok", "events": []}, {"time": "2026-10-14T12:12:44.000Z", "slot": "510982942", "signature": "2KZbaS3xcQ7AygZVYNzJYfYWfd8R6PJeZjn2b2xTNib8mRHmY5KNJ3LktJAaJYQn6zosZZNxsqxovT8vNNcTfYoK", "instruction": "SettleStub", "status": "ok", "events": []}, {"time": "2026-10-14T14:12:28.000Z", "slot": "511013004", "signature": "3VUbNfdfeKpfrTjXJUnTPfQK6wnVrYQLYw6618tuyKsC1PXfdHdsrS9v1i1rEMBmUaRB1TND7Ujxq5hHgvtfw51G", "instruction": "(none)", "status": "ok", "events": []}, {"time": "2026-10-14T14:13:22.000Z", "slot": "511013227", "signature": "4ispfRHSCsUQxSbek8tkfC7EX9Jxqdaj5qoY5VaZuuDGatpepeX54xdte3qTsrHqq2b47P1KW5FRacTxQ63X4JQL", "instruction": "(none)", "status": "ok", "events": []}, {"time": "2026-10-14T14:20:57.000Z", "slot": "511015128", "signature": "CysbAL2ppz8Bv2PFzN4edAjmWd89WRz56MVPnFSMeBivD8d3SbB1TcGnEq12ZPCchMW47atFKKcNrsswDLqYkFP", "instruction": "InitConfig", "status": "ok", "events": []}, {"time": "2026-10-14T14:21:04.000Z", "slot": "511015159", "signature": "2XDS5xNWH4tbUBcCsSJhWAFnTfiifFze1etenPFv2HzVLCuzCb7ALAvLpqQHZxC8qACnAfjTzQTZT4aySAqVXxh7", "instruction": "IssueCredential", "status": "ok", "events": []}, {"time": "2026-10-14T14:21:12.000Z", "slot": "511015192", "signature": "2SzAXDQqiFDNSeDsgWuhdj59FVtQ1RBYmDbWakMCBYGrEtoXshFExe2pUdY5dqsZt6DWRgjznnePNpmDGtcN5XHY", "instruction": "IssueCredential", "status": "ok", "events": []}, {"time": "2026-10-14T14:29:15.000Z", "slot": "511017219", "signature": "5o35xSWPBD3UwbqPR3Mv9DzB6UwzKDgFbPMUeaCEr93WG3r5hpjges2QxnbeEQys2j35xmCbdDtB4qZqWfvir6Nt", "instruction": "Settle", "status": "{\"InstructionError\":[\"0\",{\"Custom\":\"3012\"}]}", "events": []}, {"time": "2026-10-14T14:30:17.000Z", "slot": "511017476", "signature": "4tDYgMoBKW8ABaaLyArQNMxDUNEFqPeJEQiDnQFJDsJnVUNrAqz2uLSQzUu17h79dRcfQ5QfCkhn9gswpBWjX3na", "instruction": "RegisterTrade", "status": "ok", "events": []}, {"time": "2026-10-14T14:30:26.000Z", "slot": "511017516", "signature": "5MUcDHFsGo5kb46NHjixqJ4PX9wbGFAi4ib2LoFc7Wc1RD28QAfVtHw28AVQUzacPqo8GQ7ief65Wry7Q2fEEHLe", "instruction": "Settle", "status": "ok", "events": []}, {"time": "2026-10-14T14:39:07.000Z", "slot": "511019702", "signature": "5WtT9xPZduEtfQeHp5bG2g3Hy4a1EmoF4ZuFNve5Ss5oc5yut2KMoemNrp9F13Z8pcnVdtNik4rZz8Rm92Vm41Jq", "instruction": "(none)", "status": "ok", "events": []}, {"time": "2026-10-14T14:40:12.000Z", "slot": "511019976", "signature": "4W9yeLMzBvCu8FmzL2FJmASyds4forHqx7igBC62mK3XtJyCaX7mGNQUAwFvnfpyvpJ1THvdRN75kuX41DVx7ec8", "instruction": "RegisterTrade", "status": "ok", "events": []}, {"time": "2026-10-14T14:40:23.000Z", "slot": "511020022", "signature": "3oShWDTisvoxHp5r72E61xVzDRJb6zdNctRoyXWJpMHg5MxRLYJHHpJBp2KEWAAnGco2e9qgHEie5sKHf3kCmCaD", "instruction": "Settle", "status": "ok", "events": []}, {"time": "2026-10-14T14:46:31.000Z", "slot": "511021562", "signature": "5hXV3qWhR5b6ZYdgGkJ6MZpYU7K3JaJLFsPSr3EqYxuctYuiKF8djAJZjzNFX3BrvmTs9RNmQYHbLwhAwbPeGywA", "instruction": "RegisterTrade", "status": "ok", "events": []}, {"time": "2026-10-14T14:46:39.000Z", "slot": "511021593", "signature": "2AJyPXqwQb2x4xktt2jZmSgjWjZD9ghsQ4zLumme4T5EhmpHUzV41j55U8QNbHvNX92obq7CycrTTXWRaoeekiPS", "instruction": "SetCredential", "status": "ok", "events": []}, {"time": "2026-10-14T14:46:48.000Z", "slot": "511021633", "signature": "33vzuzwjHSkZboQXgEF1viwdfxtjoprzsFFx16K1ATwJMbKpPafyA1wWHmNNbQcTahL8fhLx3K1jiPdJrCuKfkYc", "instruction": "Settle", "status": "{\"InstructionError\":[\"0\",{\"Custom\":\"6012\"}]}", "events": []}, {"time": "2026-10-14T14:46:57.000Z", "slot": "511021670", "signature": "5QWgS1vvzVFF2ZiJTzq7kEpbj3DBSsoPVqrDE9oYrkfUumHTk2CgcTn4a7zTwmg6LQkjscrVRb8Cbr1scTymjcDS", "instruction": "SetCredential", "status": "ok", "events": []}, {"time": "2026-10-14T14:47:14.000Z", "slot": "511021738", "signature": "JXEVRbCdeyqRWMSQVakSCd7Dhf1D5fTVhj32JpTc8ujfBhSX3pR4LSMGUxPhdoKcHjAwdncQ2E7pY1CvaUirX9k", "instruction": "Settle", "status": "ok", "events": []}, {"time": "2026-10-14T15:24:40.000Z", "slot": "511031149", "signature": "2P47GeeeoggaTebnPHDsqJkYxeaVL1NcsDvMKKhPitoTdP9qDR3tq1Mcn17h73tAqYNLazws52tAfFBDxCHkQXnH", "instruction": "(none)", "status": "ok", "events": []}, {"time": "2026-10-14T15:26:17.000Z", "slot": "511031556", "signature": "44p7yiLuTr7YJ9hYvZCTq1Jo7jRhxvJjLARbcov6THk5GFjZaDr7Fma5K9ADWXKQkiGY75TR6pkxxgwHNYXR4S3Y", "instruction": "RegisterTrade", "status": "ok", "events": [{"name": "TradeRegistered", "fields": {"swap_dvp": "4SEBA57zvghDhURyMcSLq9KoPieC8vNBBASGUUi4fdwR", "user_a": "FbCeN7dc9z7GQLa7ZYhNoc6GJnEpxobFQQ7uLgnnKkMJ", "user_b": "5durZuNjjh62qELd6KkfwUJ6NGPfsSwL1qoxwm8cQNRB", "refund_to": "4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT", "amount_a": "10000000", "amount_b": "5000000"}}]}, {"time": "2026-10-14T15:26:28.000Z", "slot": "511031601", "signature": "2zePt15vxgicy8T6SCJsHTKwJD851ZAUDbxG4fz7c5nHZnUzABB871jhVucaiydTs7vRqbH8cmx3FtDkx8MmERPa", "instruction": "CloseTrade", "status": "{\"InstructionError\":[\"0\",{\"Custom\":\"6016\"}]}", "events": []}, {"time": "2026-10-14T15:26:43.000Z", "slot": "511031666", "signature": "3Nh5MzuAK9TghTSnSJFYs5MXaeHXcUqtuwvES67GMDMKWc56oB8Uhp2xxBXEmUFwvEmSREZtVgWDvixNeHzhNZ3s", "instruction": "CloseTrade", "status": "ok", "events": [{"name": "TradeClosed", "fields": {"swap_dvp": "4SEBA57zvghDhURyMcSLq9KoPieC8vNBBASGUUi4fdwR", "refund_to": "4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT"}}]}, {"time": "2026-10-14T15:37:10.000Z", "slot": "511034311", "signature": "5vHREgCMutj4Cb4rRe2QE6b397m89mb8NctRyqyNXf8FgQTBgnLkzNWcrf39QYsueoqQRGgnQRCFFg2VdR6Dq5PP", "instruction": "RegisterTrade", "status": "ok", "events": [{"name": "TradeRegistered", "fields": {"swap_dvp": "DCQb9UuLaaigC957DqeatepeM7JR7cYsPwJc7Qe4DW3p", "user_a": "FbCeN7dc9z7GQLa7ZYhNoc6GJnEpxobFQQ7uLgnnKkMJ", "user_b": "5durZuNjjh62qELd6KkfwUJ6NGPfsSwL1qoxwm8cQNRB", "refund_to": "4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT", "amount_a": "10000000", "amount_b": "5000000"}}]}, {"time": "2026-10-14T15:37:17.000Z", "slot": "511034339", "signature": "38tTcya12Dig9Th8nP9YGnwFo1nx3mnDvKJ46djqcNwoRgGpTYUU6Zkw6fAMjuhd4rbW46kviQCB1H7xENVMM4cG", "instruction": "Settle", "status": "ok", "events": [{"name": "TradeSettled", "fields": {"swap_dvp": "DCQb9UuLaaigC957DqeatepeM7JR7cYsPwJc7Qe4DW3p", "user_a": "FbCeN7dc9z7GQLa7ZYhNoc6GJnEpxobFQQ7uLgnnKkMJ", "user_b": "5durZuNjjh62qELd6KkfwUJ6NGPfsSwL1qoxwm8cQNRB", "amount_a": "10000000", "amount_b": "5000000", "rent_returned": "5953760", "refund_to": "4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT"}}]}, {"time": "2026-10-14T15:56:27.000Z", "slot": "511039155", "signature": "2eeJYkwAjqvNjEDBbmj1brSLXGmWH6GaTqtPVx1KC8HFWXRfqqhwgfuoFNKBrxqERTLgQ9q2ozVZohHyKHK3QscT", "instruction": "RegisterTrade", "status": "ok", "events": [{"name": "TradeRegistered", "fields": {"swap_dvp": "Fz8SthSfrknA6zJrQkg6Mkv4WCyGeApc8b2YBZ5j8jix", "user_a": "FbCeN7dc9z7GQLa7ZYhNoc6GJnEpxobFQQ7uLgnnKkMJ", "user_b": "5durZuNjjh62qELd6KkfwUJ6NGPfsSwL1qoxwm8cQNRB", "refund_to": "4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT", "amount_a": "10000000", "amount_b": "5000000"}}]}, {"time": "2026-10-14T15:56:34.000Z", "slot": "511039183", "signature": "5i15Zt2RC69h7nApeu6NcT1vBsWK46JnQaLkUVTFmhr4nbU8ELDG7MgXu1PNyUX7VVHPyk9VJzzBwjJmbdGaUJTK", "instruction": "Settle", "status": "ok", "events": [{"name": "TradeSettled", "fields": {"swap_dvp": "Fz8SthSfrknA6zJrQkg6Mkv4WCyGeApc8b2YBZ5j8jix", "user_a": "FbCeN7dc9z7GQLa7ZYhNoc6GJnEpxobFQQ7uLgnnKkMJ", "user_b": "5durZuNjjh62qELd6KkfwUJ6NGPfsSwL1qoxwm8cQNRB", "amount_a": "10000000", "amount_b": "5000000", "rent_returned": "5953760", "refund_to": "4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT"}}]}, {"time": "2026-10-14T15:59:56.000Z", "slot": "511040027", "signature": "3UMzKe7eiWabvDZyoqpHEP5Cr3tBGWs5N9bQYf73EfzMan49Ps9QJdmTwbdGAc2TJEchLprPNxJkj1khdwrXKFnB", "instruction": "RegisterTrade", "status": "ok", "events": [{"name": "TradeRegistered", "fields": {"swap_dvp": "BuRyfW4Dhj2cGLhYZXBmcRC8i2f9gDfEvvTxT24xHR7p", "user_a": "FbCeN7dc9z7GQLa7ZYhNoc6GJnEpxobFQQ7uLgnnKkMJ", "user_b": "5durZuNjjh62qELd6KkfwUJ6NGPfsSwL1qoxwm8cQNRB", "refund_to": "4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT", "amount_a": "10000000", "amount_b": "5000000"}}]}, {"time": "2026-10-14T16:00:09.000Z", "slot": "511040081", "signature": "3QvEpzWQxhSQoZ3aQu93ryFVb7eiXEiKKSixBqMa6PELeArh46Un61oZM5Am5WjW2nAW9xS9gNJAJqi7jai5huwR", "instruction": "Settle", "status": "ok", "events": [{"name": "TradeSettled", "fields": {"swap_dvp": "BuRyfW4Dhj2cGLhYZXBmcRC8i2f9gDfEvvTxT24xHR7p", "user_a": "FbCeN7dc9z7GQLa7ZYhNoc6GJnEpxobFQQ7uLgnnKkMJ", "user_b": "5durZuNjjh62qELd6KkfwUJ6NGPfsSwL1qoxwm8cQNRB", "amount_a": "10000000", "amount_b": "5000000", "rent_returned": "5953760", "refund_to": "4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT"}}]}]};
+const scenes=D.scenes,led={};
+D.ledger.forEach(r=>{led[r.signature]=r});
+const LBL={};scenes.forEach(function(s){s.rows.forEach(function(r){LBL[r.sig]=r.label})});
+const MAP=[['upgrades',['box-ref']],['core claim',['n-pda','n-dvp','e-pda']],['setup',['n-issuer','n-config','n-cred','e-issuer']],['refusal',['n-trade','n-cred','n-pda']],['registered',['n-parties','n-trade','n-cred','n-pda','n-dvp','e-parties','e-pda']],['anyone',['n-keeper','n-pda','n-dvp','e-keeper','e-pda']],['unwinding',['n-parties','n-dvp','n-trade']]];
+let timer=null;
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function lit(title){
+  document.querySelectorAll('.node,.edge,#box-ref').forEach(function(e){e.classList.remove('on')});
+  var t=title.toLowerCase();
+  for(var i=0;i<MAP.length;i++){
+    if(t.indexOf(MAP[i][0])>=0){MAP[i][1].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.add('on')});break}
+  }
+}
+function code(st){var m=/Custom\W+(\d+)/.exec(st);return m?m[1]:st}
+function pill(s){
+  var r=led[s];
+  if(!r)return '<span class="pill">on chain</span>';
+  return r.status==='ok'?'<span class="pill ok">ok</span>':'<span class="pill bad">refused, error '+esc(code(r.status))+'</span>';
+}
+function sigCell(s){
+  var cmd='solana confirm -v '+s+' --url devnet';
+  return '<div class="sig">'+esc(s)+'</div><button class="c" data-cmd="'+esc(cmd)+'">copy confirm command</button> <a target="_blank" rel="noopener" href="https://explorer.solana.com/tx/'+s+'?cluster=devnet">explorer</a>';
+}
+function when(r){return r?esc(r.time.replace('T',' ').replace('.000Z','')):''}
+function show(i){
+  var s=scenes[i];
+  lit(s.title);
+  document.querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('sel',j===i)});
+  var h='<h2>'+esc(s.title)+'</h2><table><tr><th>Step</th><th>Result</th><th>Signature</th><th>Time (UTC)</th></tr>';
+  s.rows.forEach(function(r,n){
+    var l=led[r.sig];
+    h+='<tr id="r'+n+'"><td>'+esc(r.label)+(r.detail?'<div class="mutd">'+esc(r.detail)+'</div>':'')+'</td><td>'+pill(r.sig)+(l&&l.events&&l.events.length?'<div class="ev">'+l.events.map(function(e){return esc(e.name)}).join(', ')+'</div>':'')+'</td><td>'+sigCell(r.sig)+'</td><td>'+when(l)+'</td></tr>';
+  });
+  h+='</table>';
+  document.getElementById('scene').innerHTML=h;
+}
+function play(){
+  clearInterval(timer);
+  var rows=Array.prototype.slice.call(document.querySelectorAll('#scene tr[id]'));
+  var n=0;
+  rows.forEach(function(r){r.style.background=''});
+  timer=setInterval(function(){
+    rows.forEach(function(r){r.style.background=''});
+    if(n>=rows.length){clearInterval(timer);return}
+    rows[n].style.background='#17263a';
+    rows[n].scrollIntoView({block:'nearest',behavior:'smooth'});
+    n++;
+  },1300);
+}
+var tabs=document.getElementById('tabs');
+scenes.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.className='tab';b.textContent=s.title;
+  b.onclick=function(){clearInterval(timer);show(i)};
+  tabs.appendChild(b);
+});
+document.getElementById('play').onclick=play;
+document.addEventListener('click',function(e){
+  var b=e.target.closest('button.c');
+  if(b){if(navigator.clipboard){navigator.clipboard.writeText(b.dataset.cmd)}b.textContent='copied'}
+});
+function go(k){for(var i=0;i<scenes.length;i++){if(scenes[i].title.toLowerCase().indexOf(k)>=0){clearInterval(timer);show(i);document.getElementById('scene').scrollIntoView({behavior:'smooth'});return}}}
+document.addEventListener('click',function(e){var a=e.target.closest('a[data-go]');if(a){e.preventDefault();go(a.dataset.go)}});
+var start=0;
+scenes.forEach(function(s,i){if(s.title.toLowerCase().indexOf('refusal')>=0)start=i});
+show(start);
+var tl='<table><tr><th>Time (UTC)</th><th>Instruction</th><th>Result</th><th>Signature</th></tr>';
+D.ledger.forEach(function(r){
+  tl+='<tr><td>'+when(r)+'</td><td>'+esc(r.instruction==='(none)'?'Program loader':r.instruction)+(LBL[r.signature]?'<div class="mutd">'+esc(LBL[r.signature])+'</div>':'')+(r.events&&r.events.length?'<div class="ev">'+r.events.map(function(e){return esc(e.name)}).join(', ')+'</div>':'')+'</td><td>'+pill(r.signature)+'</td><td>'+sigCell(r.signature)+'</td></tr>';
+});
+tl+='</table>';
+document.getElementById('timeline').innerHTML=tl;
+document.getElementById('tlnote').textContent=D.ledger.length+' transactions that called the REFEREE program, oldest first. Transactions that only called DvP (create, fund, reject) are not in this list.';
+</script></body></html>

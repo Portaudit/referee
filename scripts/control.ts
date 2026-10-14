@@ -27,6 +27,7 @@ import {
   findSwapDvpEscrowAta,
   findSwapDvpPda,
   getCreateDvpInstruction,
+  getRejectDvpInstruction,
   getSettleDvpInstruction,
   verifySwapDvp,
 } from "../dvp/index";
@@ -166,6 +167,23 @@ function buildSettle(d: D, authority: KeyPairSigner) {
   });
 }
 
+function buildReject(d: D, signer: KeyPairSigner) {
+  return getRejectDvpInstruction({
+    signer,
+    swapDvp: d.swapDvp,
+    mintA: d.mintA,
+    mintB: d.mintB,
+    dvpAtaA: d.dvpAtaA,
+    dvpAtaB: d.dvpAtaB,
+    userAAtaA: d.aA, // refund ATA for leg A
+    userBAtaB: d.bB, // refund ATA for leg B
+    tokenProgramA: TOKEN_PROGRAM,
+    tokenProgramB: TOKEN_PROGRAM,
+    memoProgram: MEMO,
+    legAExtrasCount: 0,
+  });
+}
+
 const ROLE = ["readonly", "writable", "readonly+signer", "writable+signer"];
 function printIx(label: string, ix: Instruction) {
   console.log(`\n--- ${label} ---`);
@@ -251,6 +269,10 @@ async function main() {
     const ix = buildSettle(d, authority) as Instruction;
     printIx("SettleDvp", ix);
     await send("settle", [ix], wallet);
+  } else if (cmd === "reject") {
+    const ix = buildReject(d, userB) as Instruction;
+    printIx("RejectDvp (signed by user B)", ix);
+    await send("reject", [ix], wallet);
   } else if (cmd === "show") {
     const info = await rpc.getAccountInfo(d.swapDvp, { encoding: "base64" }).send();
     if (!info.value) {

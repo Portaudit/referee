@@ -1,0 +1,17 @@
+{
+  "name": "referee",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@solana-program/system": "0.8.1",
+    "@solana-program/token": "^0.6.0",
+    "@solana-program/token-2022": "^0.5.0",
+    "@solana/kit": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

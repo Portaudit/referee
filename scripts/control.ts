@@ -89,7 +89,7 @@ async function derive() {
   const userB = address(env.USER_B);
   const mintA = address(env.MINT_A);
   const mintB = address(env.MINT_B);
-  const authority = address(env.AUTHORITY);
+  const authority = address(process.env.AUTH_ADDR ?? env.AUTHORITY);
   const [swapDvp] = await findSwapDvpPda({
     settlementAuthority: authority, userA, userB, mintA, mintB, nonce: NONCE,
   });

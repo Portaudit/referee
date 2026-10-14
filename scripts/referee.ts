@@ -329,8 +329,17 @@ async function main() {
       "mint_a", "mint_b", "dvp_ata_a", "dvp_ata_b", "user_a_destination_ata_b", "user_b_destination_ata_a",
       "user_a_ata_a", "user_b_ata_b", "token_program_a", "token_program_b", "memo_program", "dvp_program"]);
     await run("settle", [i], wallet);
+  } else if (cmd === "close-trade") {
+    const n = nonceEnv();
+    const d = await derive(n);
+    const tr = await acct(d.trade);
+    if (!tr) die(`no trade registration at ${d.trade}`);
+    const refund = key(tr.data, 104);
+    const i = ix("close_trade", [[d.swap, R], [d.trade, W], [refund, W]]);
+    show("close_trade", i, ["swap_dvp", "trade", "refund_to"]);
+    await run("close-trade", [i], wallet);
   } else {
-    console.log("usage: tsx scripts/referee.ts status | init-config | issue | set-credential | register | settle");
+    console.log("usage: tsx scripts/referee.ts status | init-config | issue | set-credential | register | settle | close-trade");
   }
 }
 

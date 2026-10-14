@@ -94,6 +94,12 @@ pub mod referee_stub {
         c.flags = flags;
         c.expires_at = expires_at;
         c.bump = ctx.bumps.credential;
+        emit!(CredentialSet {
+            subject,
+            issuer: ctx.accounts.issuer.key(),
+            flags,
+            expires_at,
+        });
         Ok(())
     }
 
@@ -102,6 +108,12 @@ pub mod referee_stub {
         let c = &mut ctx.accounts.credential;
         c.flags = flags;
         c.expires_at = expires_at;
+        emit!(CredentialSet {
+            subject: c.subject,
+            issuer: ctx.accounts.issuer.key(),
+            flags,
+            expires_at,
+        });
         Ok(())
     }
 
@@ -149,6 +161,14 @@ pub mod referee_stub {
         t.registered_at = now;
         t.bump = ctx.bumps.trade;
         msg!("referee: trade registered {}", swap.key());
+        emit!(TradeRegistered {
+            swap_dvp: swap.key(),
+            user_a: signer_a,
+            user_b: signer_b,
+            refund_to,
+            amount_a,
+            amount_b,
+        });
         Ok(())
     }
 
@@ -210,6 +230,30 @@ pub mod referee_stub {
             )?;
         }
         msg!("referee: returned {} lamports of rent to {}", gained, ctx.accounts.refund_to.key());
+        emit!(TradeSettled {
+            swap_dvp: *swap_info.key,
+            user_a: ctx.accounts.trade.user_a,
+            user_b: ctx.accounts.trade.user_b,
+            amount_a: ctx.accounts.trade.amount_a,
+            amount_b: ctx.accounts.trade.amount_b,
+            rent_returned: gained,
+            refund_to: ctx.accounts.refund_to.key(),
+        });
+        Ok(())
+    }
+
+    /// Closes the registration of a trade whose DvP record no longer exists (for example it was
+    /// rejected or reclaimed through DvP) and returns the registration rent to refund_to. Anyone may call it.
+    pub fn close_trade<'info>(ctx: Context<'info, CloseTrade<'info>>) -> Result<()> {
+        let swap = ctx.accounts.swap_dvp.to_account_info();
+        require!(
+            *swap.owner != DVP_PROGRAM_ID && swap.data_is_empty(),
+            RefereeError::TradeStillOpen
+        );
+        emit!(TradeClosed {
+            swap_dvp: swap.key(),
+            refund_to: ctx.accounts.refund_to.key(),
+        });
         Ok(())
     }
 }
@@ -318,6 +362,57 @@ pub struct Settle<'info> {
     pub system_program: Program<'info, System>,
 }
 
+#[derive(Accounts)]
+pub struct CloseTrade<'info> {
+    /// CHECK: the DvP trade record address; the handler requires that it no longer exists as a DvP account.
+    pub swap_dvp: UncheckedAccount<'info>,
+    #[account(
+        mut,
+        close = refund_to,
+        seeds = [TRADE_SEED, swap_dvp.key().as_ref()],
+        bump = trade.bump
+    )]
+    pub trade: Account<'info, Trade>,
+    /// CHECK: receives the registration rent; must equal the address both parties signed.
+    #[account(mut, address = trade.refund_to)]
+    pub refund_to: UncheckedAccount<'info>,
+}
+
+#[event]
+pub struct TradeRegistered {
+    pub swap_dvp: Pubkey,
+    pub user_a: Pubkey,
+    pub user_b: Pubkey,
+    pub refund_to: Pubkey,
+    pub amount_a: u64,
+    pub amount_b: u64,
+}
+
+#[event]
+pub struct TradeSettled {
+    pub swap_dvp: Pubkey,
+    pub user_a: Pubkey,
+    pub user_b: Pubkey,
+    pub amount_a: u64,
+    pub amount_b: u64,
+    pub rent_returned: u64,
+    pub refund_to: Pubkey,
+}
+
+#[event]
+pub struct TradeClosed {
+    pub swap_dvp: Pubkey,
+    pub refund_to: Pubkey,
+}
+
+#[event]
+pub struct CredentialSet {
+    pub subject: Pubkey,
+    pub issuer: Pubkey,
+    pub flags: u8,
+    pub expires_at: i64,
+}
+
 #[account]
 #[derive(InitSpace)]
 pub struct Config {
@@ -383,4 +478,6 @@ pub enum RefereeError {
     BadAccountCount,
     #[msg("The last remaining account must be the DvP program")]
     WrongDvpProgram,
+    #[msg("The DvP trade record still exists; settle it or reject it first")]
+    TradeStillOpen,
 }

@@ -25,7 +25,7 @@ Limits: the demo issuer is a keypair controlled by the project author, so creden
 
 - `dvp/`: generated TypeScript client for the Solana Foundation's DvP program, copied under the MIT licence (see `dvp/LICENSE`).
 - `program/`: Anchor source of the deployed program (see `program/README.md`).
-- `scripts/`: devnet test scripts: `control.ts` (create, fund, settle and reject with a keypair or PDA authority), `pda.ts` (derives the authority PDA) and `settle-stub.ts` (the Test B client for the earlier stub, which is no longer deployed) `referee.ts` (client for the current program) and `control22.ts` and `referee22.ts` (the same two for Token-2022 mints; they read a separate `state22.env`). They need sandbox keypairs that are not in this repository.
+- `scripts/`: devnet test scripts: `control.ts` (create, fund, settle and reject with a keypair or PDA authority), `pda.ts` (derives the authority PDA) and `settle-stub.ts` (the Test B client for the earlier stub, which is no longer deployed), `referee.ts` (client for the current program) and `control22.ts` and `referee22.ts` (the same two for Token-2022 mints; they read a separate `state22.env`). They need sandbox keypairs that are not in this repository.
 
 ## Licence
 

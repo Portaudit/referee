@@ -127,6 +127,7 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 <li><a href="#" data-go="anyone">Anyone can trigger settlement: a fresh key did, and a keeper script found a trade by itself.</a></li>
 <li><a href="#" data-go="unwinding">A rejected trade's registration can be closed and its rent returned.</a></li>
 <li><a href="#" data-go="token-2022">Plain Token-2022 trades settle too: DvP alone settled one, then a Referee-gated one. Mint extensions are not checked.</a></li>
+<li><a href="#" data-go="verifex">A program can be the credential issuer: a minimal Verifex checked one thing and issued credentials by CPI, and a refused agent got none. It does not yet bind the program to the subject.</a></li>
 </ul>
 <div class="mutd">Devnet only, unaudited. The demo issuer is a keypair controlled by the author, so credentials are a demonstration and not KYC.</div>
 </div>
@@ -147,7 +148,7 @@ const D=__DATA__;
 const scenes=D.scenes,led={};
 D.ledger.forEach(r=>{led[r.signature]=r});
 const LBL={};scenes.forEach(function(s){s.rows.forEach(function(r){LBL[r.sig]=r.label})});
-const MAP=[['token-2022',['n-parties','n-trade','n-cred','n-pda','n-dvp','e-parties','e-pda']],['upgrades',['box-ref']],['core claim',['n-pda','n-dvp','e-pda']],['setup',['n-issuer','n-config','n-cred','e-issuer']],['refusal',['n-trade','n-cred','n-pda']],['registered',['n-parties','n-trade','n-cred','n-pda','n-dvp','e-parties','e-pda']],['anyone',['n-keeper','n-pda','n-dvp','e-keeper','e-pda']],['unwinding',['n-parties','n-dvp','n-trade']]];
+const MAP=[['token-2022',['n-parties','n-trade','n-cred','n-pda','n-dvp','e-parties','e-pda']],['upgrades',['box-ref']],['core claim',['n-pda','n-dvp','e-pda']],['setup',['n-issuer','n-config','n-cred','e-issuer']],['refusal',['n-trade','n-cred','n-pda']],['registered',['n-parties','n-trade','n-cred','n-pda','n-dvp','e-parties','e-pda']],['anyone',['n-keeper','n-pda','n-dvp','e-keeper','e-pda']],['unwinding',['n-parties','n-dvp','n-trade']],['verifex',['n-issuer','n-config','n-cred']]];
 let timer=null;
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function lit(title){

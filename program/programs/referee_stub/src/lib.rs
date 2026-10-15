@@ -87,6 +87,12 @@ pub mod referee_stub {
         Ok(())
     }
 
+    /// Admin-only: points the credential issuer at a different key (for example a program PDA).
+    pub fn set_issuer(ctx: Context<SetIssuer>, issuer: Pubkey) -> Result<()> {
+        ctx.accounts.config.issuer = issuer;
+        Ok(())
+    }
+
     /// The issuer attests that a subject may settle until expires_at (unix seconds).
     pub fn issue_credential(
         ctx: Context<IssueCredential>,
@@ -277,6 +283,14 @@ pub struct InitConfig<'info> {
     )]
     pub config: Account<'info, Config>,
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct SetIssuer<'info> {
+    #[account(address = ADMIN @ RefereeError::NotAdmin)]
+    pub admin: Signer<'info>,
+    #[account(mut, seeds = [CONFIG_SEED], bump = config.bump)]
+    pub config: Account<'info, Config>,
 }
 
 #[derive(Accounts)]

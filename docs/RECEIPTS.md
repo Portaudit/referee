@@ -4,7 +4,7 @@ Every claim in this repository's README maps to a transaction on Solana devnet. 
 
 `solana confirm -v <signature> --url devnet`
 
-All of it ran on 14 October 2026 (UTC) against the Solana Foundation's DvP program (`dvp34bdbcEm4f4FCUjGV4mDAkDshaQR4LkK8fdcsyZq`) and the REFEREE program (`EeviRiwTbsLcnYCkagwppFD9aRmN6fVeax9WN3tuTZEe`). The authority PDA is `GE7FbxTFG1ExcvCCuqScLxto65uw5rHqQFpwrH3cDyew`. The demo issuer is `BbZBpYf7UW7nocu9TVrQkpVoA7HhjvKXvozhMRoA5uFY` (a keypair controlled by the project author). Unaudited. Devnet only.
+It ran on 14 and 15 October 2026 (UTC) against the Solana Foundation's DvP program (`dvp34bdbcEm4f4FCUjGV4mDAkDshaQR4LkK8fdcsyZq`) and the REFEREE program (`EeviRiwTbsLcnYCkagwppFD9aRmN6fVeax9WN3tuTZEe`). The authority PDA is `GE7FbxTFG1ExcvCCuqScLxto65uw5rHqQFpwrH3cDyew`. The demo issuer is `BbZBpYf7UW7nocu9TVrQkpVoA7HhjvKXvozhMRoA5uFY` (a keypair controlled by the project author). From the fifth upgrade on, Referee's configured issuer can be the Verifex program's PDA `72PiHwHvMASwKLJoc76VkheqLyxaUDeRV69DM9graiGz`; the credentials in the Verifex section below were issued by it. Unaudited. Devnet only.
 
 ## The program and its upgrades
 
@@ -78,6 +78,24 @@ Plain Token-2022 mints only (no extensions). Referee accepts the Token-2022 prog
 | Referee-gated trade (trade 2002): fund | `35RDU1M3TWMM9Rk6zkixDog9vjnE82ZS6yWrBPPPJbGuXLzkCYjn8PCwWUSpXTjzJ97aLTzthgm7CB2BPtjxy9y8` |
 | Referee-gated trade (trade 2002): register | `4XQFrrCJb2eSYnhmt3A1aYmWwKAQPhamznJBayuSfwJS3q91txaSayQ4nMmBqvsyW1dicqYEpAxbWsAHZrfYQC9Z` |
 | Referee-gated trade (trade 2002): settle, rent returned to the chosen address | `5u4hqtuQdt9a3AL6k1tjwPGEko1XiJCmaDnGWcMR6c9FoK6JuEunRPHRNwkmCMTxscnYSrN7V2qVNXqx5Lk7NtGn` |
+
+## Verifex: a program issues the credentials
+
+A minimal Verifex program (`4GTqnRnN4ZDTzHf2EeqQW98RhDAtCkwG7vTgaPapR4Qs`) runs one check, that the presented agent program has no upgrade authority, and then calls Referee's `issue_credential` as the issuer, signing with its own PDA. This demonstrates the issuer path. It does not bind the presented program to the subject's identity, and the two agent programs here are stand-ins: the classic Token program (no upgrade authority on devnet) and Token-2022 (upgradeable). Referee's admin pointed the issuer at Verifex's PDA with a new admin-only `set_issuer`.
+
+| Scene | Signature |
+|---|---|
+| Verifex program deployed (96,328 bytes) | `4M81UFX89uPW1bc5zW1hRvq4ueBJwEqkAKDZ6euG5So6jbj7MCtLTT7VU4UWY7SV4yEvGz6buUCbMmPqW41Ps27R` |
+| Fifth in-place upgrade adds `set_issuer` (233,056 bytes, sha256 `0ca7e752be598b4ff3f38f6ad93f5fe7c4d7436f9c93a281e3dcbb38708f1a5b`) | `2Py1tTyR3mUwtzoZpxyCT3pEVC4y69mSCEHgs5PC5KrzUA4ZzdakSWsVf8YJLi1vkSnzjT1dyLSwMs3QFxA4d1fv` |
+| Referee's issuer set to the Verifex PDA | `3YWaV5rUSKnytE6X38ZbVqjdF7NgqyJxkuMfjW8zseUo8RyNcEqB3htprFfWYqxMLSMxPxQNAmynbisFf8SZstjn` |
+| Agent B presents the Token-2022 program (upgradeable): Verifex refuses, `AgentNotImmutable` (6002) | `5KCURHKamfaw6XK71XF2WnbQSkjsUbbf51DFgwMewcPBKJDCm6MmaHSQBATPBRv6hiJqcFzMma7DaDLWfhXUDWtF` |
+| Agent A presents the classic Token program (immutable): Verifex issues party C's credential | `5TgLoDP6d5AFRoJAMTUvQhBaduM8UV48fWF2cEX8EKhgqugv1F82gAjapHQ8xWotTpf4s4M7oH9os7BfxerwbFzN` |
+| DvP trade 3001 between C and D: create | `5YUZRrJmFxF4fd6RHPwTGWkBwQiNA4tbJmiqpYhyzpoyTZ74xrkzAHRLoqTikhDD2VNdUMP9RLTjvMerJpAUkh5s` |
+| Trade 3001: fund | `5v9JzRV6bUNgqCQYbmGhn15rCtENjo5Nu6diKgKY5ckoxRqtFpc79RRteKHryxXucvKGV9oTVLPPbvvQaS5g3FmH` |
+| Trade 3001: register | `2MgTjEeubwGcFXFwKiJhUJN8HD4c8b9z4ti4RF5kP3JJCME7iLTnnnayk3cWMDnABgqXV63WF4rhixVgKz3CERiX` |
+| Settle while D has no credential: refused, `AccountNotInitialized` (3012) | `5EJTsD5kN7Za5FbNBFh1SHgj75jSdnhPk7iAi94KSWA3TRcfqu4KASAGdM47EjWKSQAGbQqa2pUeBspcjDYwNa71` |
+| D presents the immutable Token program: Verifex issues D's credential | `4yKndKZkXWR6FjAjWjkRpiMKjtE8gA8zJPziWzhf4oxR6vyriAzbyUxhiFXLbc4dvvSszY5RLQDJsrhiYTJKDkwb` |
+| Settle with two Verifex-issued credentials, rent returned (trade 3001) | `3vHKabVU8sB3oZuaEuC9zGMVh8f9Gy6xZ3E62SbWQ8Bk3UyJqtU1sbUFyQyRAFuxa8Vv2abz8LrtN71yzi1J2rPm` |
 
 ## Reading the whole history
 

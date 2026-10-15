@@ -1,0 +1,140 @@
+diff --git a/Anchor.toml b/Anchor.toml
+index 27b36dc..df8d09d 100644
+--- a/Anchor.toml
++++ b/Anchor.toml
+@@ -7,8 +7,8 @@ resolution = true
+ skip-lint = false
+ 
+ [programs.localnet]
+-trustrail_pipelines = "CgXidrtsV5nLkjPCYhZUPUuZUpmvekMKvDN9uh3ucoC8"
+-mock_swap = "3qqN3ZXc1SPEtDLdn9Ek68r9YtDc1mBVgdhS7r48d9vJ"
++trustrail_pipelines = "58t4gi88MNSURkwN6GuGugmXWPFqAT6s9pB56Srx4Bez"
++mock_swap = "8HL9DS7VsiLRqVwQVkRZxZDm25JgieCVLG4Brjb8oe7u"
+ 
+ [provider]
+ cluster = "devnet"
+diff --git a/programs/mock-swap/src/lib.rs b/programs/mock-swap/src/lib.rs
+index 71a95fc..4fe8403 100644
+--- a/programs/mock-swap/src/lib.rs
++++ b/programs/mock-swap/src/lib.rs
+@@ -4,7 +4,7 @@
+ use anchor_lang::prelude::*;
+ use anchor_spl::token::{self, Token, TokenAccount, Mint, Transfer};
+ 
+-declare_id!("3qqN3ZXc1SPEtDLdn9Ek68r9YtDc1mBVgdhS7r48d9vJ");
++declare_id!("8HL9DS7VsiLRqVwQVkRZxZDm25JgieCVLG4Brjb8oe7u");
+ 
+ // Fixed exchange rate. Explicitly arbitrary — no price discovery.
+ // amount_out = amount_in * RATE_NUMERATOR / RATE_DENOMINATOR
+diff --git a/programs/trustrail-pipelines/src/lib.rs b/programs/trustrail-pipelines/src/lib.rs
+index 38d2804..f971d97 100644
+--- a/programs/trustrail-pipelines/src/lib.rs
++++ b/programs/trustrail-pipelines/src/lib.rs
+@@ -3,7 +3,7 @@
+ 
+ use anchor_lang::prelude::*;
+ 
+-declare_id!("CgXidrtsV5nLkjPCYhZUPUuZUpmvekMKvDN9uh3ucoC8");
++declare_id!("58t4gi88MNSURkwN6GuGugmXWPFqAT6s9pB56Srx4Bez");
+ 
+ pub mod error;
+ pub mod instructions;
+diff --git a/worker/src/create-commitment.ts b/worker/src/create-commitment.ts
+index 8d79368..9c9073b 100644
+--- a/worker/src/create-commitment.ts
++++ b/worker/src/create-commitment.ts
+@@ -45,7 +45,7 @@ async function main() {
+   const minOutputAmount = envAmount("MIN_OUTPUT_AMOUNT", 500_000n);
+   const deadlineSlots = Number(envAmount("DEADLINE_SLOTS", 5000n, 1_000_000_000n));
+   const payer = Keypair.fromSecretKey(
+-    Buffer.from(JSON.parse(readFileSync(process.env.HOME + "/.config/solana/id.json", "utf-8")))
++    Buffer.from(JSON.parse(readFileSync(process.env.CORE_WALLET!, "utf-8")))
+   );
+ 
+   const executor = Keypair.generate();
+diff --git a/worker/src/execute-mock-swap.ts b/worker/src/execute-mock-swap.ts
+index 048ed47..885b134 100644
+--- a/worker/src/execute-mock-swap.ts
++++ b/worker/src/execute-mock-swap.ts
+@@ -20,7 +20,7 @@ async function main() {
+   );
+ 
+   // funded local wallet, pays the tx fee — adjust path if your CLI config differs
+-  const payerPath = path.join(os.homedir(), ".config/solana/id.json");
++  const payerPath = process.env.CORE_WALLET!;
+   const payer = Keypair.fromSecretKey(
+     Uint8Array.from(JSON.parse(readFileSync(payerPath, "utf-8")))
+   );
+diff --git a/worker/src/initialize-mock-pool.ts b/worker/src/initialize-mock-pool.ts
+index 39c0a05..4155584 100644
+--- a/worker/src/initialize-mock-pool.ts
++++ b/worker/src/initialize-mock-pool.ts
+@@ -18,14 +18,14 @@ import { createAccount, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+ import * as fs from "fs";
+ import { sighash, u64LE } from "./shared";
+ 
+-const MOCK_SWAP_PROGRAM_ID = new PublicKey("3qqN3ZXc1SPEtDLdn9Ek68r9YtDc1mBVgdhS7r48d9vJ");
++const MOCK_SWAP_PROGRAM_ID = new PublicKey("8HL9DS7VsiLRqVwQVkRZxZDm25JgieCVLG4Brjb8oe7u");
+ const MINTS_PATH = "mints.json";
+ 
+ async function main() {
+   const connection = getConnection();
+ 
+   const payer = Keypair.fromSecretKey(
+-    Uint8Array.from(JSON.parse(fs.readFileSync(process.env.HOME + "/.config/solana/id.json", "utf-8")))
++    Uint8Array.from(JSON.parse(fs.readFileSync(process.env.CORE_WALLET!, "utf-8")))
+   );
+ 
+   if (!fs.existsSync(MINTS_PATH)) {
+diff --git a/worker/src/mock-swap.ts b/worker/src/mock-swap.ts
+index 2aa525f..c6237b5 100644
+--- a/worker/src/mock-swap.ts
++++ b/worker/src/mock-swap.ts
+@@ -26,7 +26,7 @@ import { sighash, u64LE, commitmentPda } from "./shared";
+ // MOCK_SWAP_PROGRAM_ID. Four independent copies, nothing cross-checks them —
+ // a typo in any one fails as a generic "program not found" / wrong-owner
+ // error, not a named one.
+-const MOCK_SWAP_PROGRAM_ID = new PublicKey("3qqN3ZXc1SPEtDLdn9Ek68r9YtDc1mBVgdhS7r48d9vJ");
++const MOCK_SWAP_PROGRAM_ID = new PublicKey("8HL9DS7VsiLRqVwQVkRZxZDm25JgieCVLG4Brjb8oe7u");
+ 
+ interface MockPoolState {
+   mockSwapProgramId: string;
+diff --git a/worker/src/shared.ts b/worker/src/shared.ts
+index 68cb4d2..5191299 100644
+--- a/worker/src/shared.ts
++++ b/worker/src/shared.ts
+@@ -4,7 +4,7 @@
+ import { createHash } from "crypto";
+ import { PublicKey } from "@solana/web3.js";
+ 
+-export const PROGRAM_ID = new PublicKey("CgXidrtsV5nLkjPCYhZUPUuZUpmvekMKvDN9uh3ucoC8");
++export const PROGRAM_ID = new PublicKey("58t4gi88MNSURkwN6GuGugmXWPFqAT6s9pB56Srx4Bez");
+ 
+ export function sighash(name: string): Buffer {
+   return createHash("sha256").update(`global:${name}`).digest().subarray(0, 8);
+diff --git a/worker/src/submit-proof.ts b/worker/src/submit-proof.ts
+index 6bd6579..ca5a549 100644
+--- a/worker/src/submit-proof.ts
++++ b/worker/src/submit-proof.ts
+@@ -18,7 +18,7 @@ import { PROGRAM_ID, sighash, u64LE, explorerTx } from "./shared";
+ async function main() {
+   const connection = getConnection();
+   const payer = Keypair.fromSecretKey(
+-    Buffer.from(JSON.parse(readFileSync(process.env.HOME + "/.config/solana/id.json", "utf-8")))
++    Buffer.from(JSON.parse(readFileSync(process.env.CORE_WALLET!, "utf-8")))
+   );
+   const executor = Keypair.fromSecretKey(
+     Buffer.from(JSON.parse(readFileSync("executor-keypair.json", "utf-8")))
+diff --git a/worker/src/withdraw-for-swap.ts b/worker/src/withdraw-for-swap.ts
+index fbfbc7c..707bc2d 100644
+--- a/worker/src/withdraw-for-swap.ts
++++ b/worker/src/withdraw-for-swap.ts
+@@ -17,7 +17,7 @@ import { PROGRAM_ID, sighash, explorerTx } from "./shared";
+ async function main() {
+   const connection = getConnection();
+   const payer = Keypair.fromSecretKey(
+-    Buffer.from(JSON.parse(readFileSync(process.env.HOME + "/.config/solana/id.json", "utf-8")))
++    Buffer.from(JSON.parse(readFileSync(process.env.CORE_WALLET!, "utf-8")))
+   );
+ 
+   const last = JSON.parse(readFileSync("last-commitment.json", "utf-8"));

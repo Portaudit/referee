@@ -9,3 +9,5 @@ hash reproduces on another machine is unverified. This binary was uploaded with 
 
 Unaudited. Devnet only. Classic SPL Token and plain Token-2022 legs (mint extensions are not checked). Independent project; not affiliated with or endorsed by
 the Solana Foundation or J.P. Morgan.
+
+Verifex after its first in-place upgrade (adds `verify_outcome_and_issue`): 106136 bytes, sha256 `1ce32cc8ee76e5b0cf2bb78041840749441d9418af30ac57dedf2a8843ab7992`; its program data was extended to 116328 bytes first.

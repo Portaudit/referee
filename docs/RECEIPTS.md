@@ -97,6 +97,27 @@ A minimal Verifex program (`4GTqnRnN4ZDTzHf2EeqQW98RhDAtCkwG7vTgaPapR4Qs`) runs 
 | D presents the immutable Token program: Verifex issues D's credential | `4yKndKZkXWR6FjAjWjkRpiMKjtE8gA8zJPziWzhf4oxR6vyriAzbyUxhiFXLbc4dvvSszY5RLQDJsrhiYTJKDkwb` |
 | Settle with two Verifex-issued credentials, rent returned (trade 3001) | `3vHKabVU8sB3oZuaEuC9zGMVh8f9Gy6xZ3E62SbWQ8Bk3UyJqtU1sbUFyQyRAFuxa8Vv2abz8LrtN71yzi1J2rPm` |
 
+## TrustRail Core and Verifex Core: an outcome gates the credential
+
+Verifex's second instruction, `verify_outcome_and_issue` ("Verifex Core"), issues a Referee credential only when a commitment on TrustRail Core is `Passed` and the commitment's executor agent is the credential's subject. TrustRail Core (`58t4gi88MNSURkwN6GuGugmXWPFqAT6s9pB56Srx4Bez`) is a devnet-only copy of the author's separate TrustRail project under new program IDs; its mock swap (`8HL9DS7VsiLRqVwQVkRZxZDm25JgieCVLG4Brjb8oe7u`) is a disclosed 1:1 stand-in, and the patch is in `trustrail_core/`. TrustRail itself is unchanged. TrustRail's `Passed` is a weak gate: it compares the output account's balance with a minimum, and a donation to that account could satisfy it. Verifex Core trusts that status and does not check what the task was. All programs and keys here were run by the project author. Verifex's program data was extended to 116,328 bytes first (see `solana program show 4GTqnRnN4ZDTzHf2EeqQW98RhDAtCkwG7vTgaPapR4Qs --url devnet`).
+
+| Scene | Signature |
+|---|---|
+| TrustRail Core deployed (268,368 bytes) | `LVGzKA4TxJ2EjSYok8saCn8HFa5YVtX6VBPfMMLHefqvDFgjcL9nWB24vsbLmqaSLE4LZ1P6s3erkW99wpTGFFB` |
+| Mock swap deployed (114,280 bytes) | `263FHbihhzQcYjxU1gq5Wg3RC3z8w6HjRwZgumUw6vpZ1DjC42SkYyu3yCTY9ynS5T3UJj5CEGt12AnqDcpKfoLQ` |
+| Verifex upgraded in place to add `verify_outcome_and_issue` (106,136 bytes, sha256 `1ce32cc8ee76e5b0cf2bb78041840749441d9418af30ac57dedf2a8843ab7992`) | `3JZTS9pmnKmmd9DdjgVcL86sg5hFkiAhYznStdCQ6mHykdsUrbpAoTzmAFvS26vAwspmUdjNxVqWM6c5fQiRdUy8` |
+| Commitment created on TrustRail Core: 1,000,000 in, 500,000 minimum out, executor `EkA7LiSKxc9pqxkByWR7BrPAZjmqto7naJK8C3oTBqtw` | `5bHp6V9WNg1sUCCRAtWzWU8EbbDL3W4GWNJiswnGEQf9Vo58MRrYByX4Gjq6kJgbNf75XzaxaPu1wB327fH92YoY` |
+| Mock pool initialised | `5HjLXJLPBbaiEeizSdRoueL4PPjmwBWrwYyzbjTWxE4gWzBJiAVf1yr3XauyqePi8xtkVVsEjebwkWkqQZ4GdZf3` |
+| Escrow moved to the swap staging account | `3TQdpXREkpAuo11VXBEBsSJuyv5jm6S7Ve8PoVRF2g9vpFuuzr95ptmmaJey3wP2NQtqYC3WQ9zTYD762Go3qCuN` |
+| Mock swap executed (1:1 stand-in) | `67WL4EHDupJoSRfoFUhPbGjk2ZPRgED2SiukqG6qfhxDmg25sJSsG4myfNPXZaAg1ZgX2xnVibtQystb2NfCVJcX` |
+| Executor submits the proof: commitment `Passed` | `3vFdVvmomA7sjzeDtCwgAapN8i28VSLjN7A4iCgeCAgN1aDugqppzsqgX3vWfhR36L2DQJQK4bFtiiV8XtjDZHY3` |
+| Verifex Core refuses a credential for another subject, `SubjectNotExecutor` (6005) | `2np47g3b2mqM9NbC5husjeujypNyWNw9FZpzRQGCvdFZeqRo9wwe2Y9iwmk8zZLWhkSEVkkbu37fhKmauUx4s38D` |
+| Verifex Core issues the executor's credential | `5axvsbgGs37dCfbc6zdyJAWGnM1PnH7tGGSyVDixuzgd4sWF8g8dfDd5m7kffztxRtATC8dPKVSd3QcPLFwcRsnY` |
+| DvP trade 4001 between the executor and D: create | `5TCpA3o7V8DyeoRhAcPiZWg4k1YYg6v45jNwsRE4M1v6PvZLspB8cSZvaqJFTikUacJRxGqKfKMnaJw5PcUnofv9` |
+| Trade 4001: fund | `2sMbrJoRaQSB9yR9abRtTprgquAXfNjKPcQPw49wdxYCSD2Z5TUTzSWypDsAQg8X9XwfDwit68TUjfCnHP4qtCEm` |
+| Trade 4001: register | `2YvHeySD5Upnpgavan4GvxB2yqfMfvP9L2odN8NSGRaPxwtGsfrEtq7A2nh7ymoB21eqHpShHREqnGk1UD8VPJoh` |
+| Settle with the Verifex Core credential and D's credential, rent returned (trade 4001) | `3cLGQQMQdVMFhpUxweLUqRzsqb2oyH9pHhffVciV8Kd9n2yz2KaZyPr5ZeUmhNunAs7gTbeK4TDj3SWx1DpCtiFG` |
+
 ## Reading the whole history
 
 `scripts/ledger.ts` lists the program's transactions and decodes its events from the logs. It only reads devnet.

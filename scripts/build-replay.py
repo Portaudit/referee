@@ -99,7 +99,7 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 <text x="20" y="16" class="mut">OFF CHAIN</text>
 <text x="300" y="16" class="mut">ON CHAIN (Solana devnet)</text>
 <g class="node" id="n-parties"><rect x="20" y="40" width="170" height="70" rx="10"/><text x="105" y="70" text-anchor="middle">Parties A and B</text><text x="105" y="90" text-anchor="middle" class="mut">co-sign the exact terms</text></g>
-<g class="node" id="n-issuer"><rect x="20" y="160" width="170" height="70" rx="10"/><text x="105" y="190" text-anchor="middle">Demo issuer</text><text x="105" y="210" text-anchor="middle" class="mut">attests eligibility</text></g>
+<g class="node" id="n-issuer"><rect x="20" y="160" width="170" height="70" rx="10"/><text x="105" y="190" text-anchor="middle">Issuer</text><text x="105" y="210" text-anchor="middle" class="mut">demo key or Verifex PDA</text></g>
 <g class="node" id="n-keeper"><rect x="20" y="280" width="170" height="70" rx="10"/><text x="105" y="310" text-anchor="middle">Anyone / keeper</text><text x="105" y="330" text-anchor="middle" class="mut">pays the fee, needs no authority</text></g>
 <rect id="box-ref" x="300" y="26" width="330" height="350" rx="14"/>
 <text x="465" y="48" text-anchor="middle">REFEREE program</text>
@@ -129,7 +129,7 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 <li><a href="#" data-go="token-2022">Plain Token-2022 trades settle too: DvP alone settled one, then a Referee-gated one. Mint extensions are not checked.</a></li>
 <li><a href="#" data-go="verifex">A program can be the credential issuer: a minimal Verifex checked one thing and issued credentials by CPI, and a refused agent got none. It does not yet bind the program to the subject.</a></li>
 </ul>
-<div class="mutd">Devnet only, unaudited. The demo issuer is a keypair controlled by the author, so credentials are a demonstration and not KYC.</div>
+<div class="mutd">Devnet only, unaudited. Credentials are a demonstration, not KYC: the issuer is the author's demo key or the minimal Verifex program.</div>
 </div>
 <div class="card">
 <div class="tabs" id="tabs"></div>

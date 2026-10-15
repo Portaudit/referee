@@ -64,6 +64,21 @@ All of it ran on 14 October 2026 (UTC) against the Solana Foundation's DvP progr
 | A party rejects through DvP (trade 1008) | `3XS1DSx4xehvaDEkY8LrimxbrGkPb1GQGCJicK3gtqQoT2CrwqnwG1caPDGZNFYTBproRAjGu2bQZC3nW4zJUaKb` |
 | `close_trade` returns the registration rent (trade 1008) | `3Nh5MzuAK9TghTSnSJFYs5MXaeHXcUqtuwvES67GMDMKWc56oB8Uhp2xxBXEmUFwvEmSREZtVgWDvixNeHzhNZ3s` |
 
+## Token-2022 legs
+
+Plain Token-2022 mints only (no extensions). Referee accepts the Token-2022 program ID and does not check mint extensions.
+
+| Scene | Signature |
+|---|---|
+| DvP alone, keypair authority (trade 2001): create | `3Ub5jE1NUMc3uYd2Wj1A7rRnkQ3gUkSAzN38okxSFh1JkLwmiT4m9UGEVnP1h659rGQWqLkAZHvGWbhjAnp39CmA` |
+| DvP alone (trade 2001): fund | `5JYX8PzWXoszvuYG6x2SKwszmf9SZknqUTxKxX8Kz24SxM6fhLbUUz8fa7b6HCUp4brhyeuPPmjV4brfc9ThwF72` |
+| DvP alone (trade 2001): settle | `3Egn2J1rkWqbDnDjhGHTtpPLWLdAeQRT66n7RwYfKqdZ5jY3ouM3peJqPd7wLVN2kuyMyWW9qRDLMs4E9RFM988o` |
+| Fourth in-place upgrade: registration accepts the Token-2022 program ID | `2HrvwvhcYNWunBLdEd55eAfcsjtNXyr9coDsorhs8w5Su2pTU54RNak3et8o9gTcgE4SXrM1pCdUC4ji6EfTtf8A` |
+| Referee-gated trade, authority is the PDA (trade 2002): create | `4bbzL5MAxjpboiSzKwhJpZBVnuReBuSJfJE7BuxVjwGfckL6UGRja57WruiV44EfCzUxdn8BbJrf4hmg5Qv6ctdB` |
+| Referee-gated trade (trade 2002): fund | `35RDU1M3TWMM9Rk6zkixDog9vjnE82ZS6yWrBPPPJbGuXLzkCYjn8PCwWUSpXTjzJ97aLTzthgm7CB2BPtjxy9y8` |
+| Referee-gated trade (trade 2002): register | `4XQFrrCJb2eSYnhmt3A1aYmWwKAQPhamznJBayuSfwJS3q91txaSayQ4nMmBqvsyW1dicqYEpAxbWsAHZrfYQC9Z` |
+| Referee-gated trade (trade 2002): settle, rent returned to the chosen address | `5u4hqtuQdt9a3AL6k1tjwPGEko1XiJCmaDnGWcMR6c9FoK6JuEunRPHRNwkmCMTxscnYSrN7V2qVNXqx5Lk7NtGn` |
+
 ## Reading the whole history
 
 `scripts/ledger.ts` lists the program's transactions and decodes its events from the logs. It only reads devnet.

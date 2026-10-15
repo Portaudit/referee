@@ -15,8 +15,14 @@ declare_id!("EeviRiwTbsLcnYCkagwppFD9aRmN6fVeax9WN3tuTZEe");
 
 /// The Solana Foundation's DvP program (same address on devnet and mainnet-beta per its docs).
 pub const DVP_PROGRAM_ID: Pubkey = pubkey!("dvp34bdbcEm4f4FCUjGV4mDAkDshaQR4LkK8fdcsyZq");
-/// Classic SPL Token program. Token-2022 legs are not supported in this version.
+/// Classic SPL Token program.
 pub const TOKEN_PROGRAM_ID: Pubkey = pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+/// Token-2022 program. Accepted for plain mints; extensions (transfer hooks, fees, ...) are not checked here.
+pub const TOKEN_2022_PROGRAM_ID: Pubkey = pubkey!("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
+
+pub fn is_supported_token_program(k: Pubkey) -> bool {
+    k == TOKEN_PROGRAM_ID || k == TOKEN_2022_PROGRAM_ID
+}
 /// Only this key may create the config account (demo admin, the Fall School wallet).
 pub const ADMIN: Pubkey = pubkey!("4KL6wnU7XayFWmziJ9U4bm17HP61FKuFpKbtphQazYLT");
 
@@ -141,8 +147,8 @@ pub mod referee_stub {
             require_keys_eq!(key_at(d, OFF_USER_A), signer_a, RefereeError::PartyMismatch);
             require_keys_eq!(key_at(d, OFF_USER_B), signer_b, RefereeError::PartyMismatch);
             require_keys_neq!(signer_a, signer_b, RefereeError::SameParty);
-            require_keys_eq!(key_at(d, OFF_TOKEN_PROGRAM_A), TOKEN_PROGRAM_ID, RefereeError::TokenProgramNotSpl);
-            require_keys_eq!(key_at(d, OFF_TOKEN_PROGRAM_B), TOKEN_PROGRAM_ID, RefereeError::TokenProgramNotSpl);
+            require!(is_supported_token_program(key_at(d, OFF_TOKEN_PROGRAM_A)), RefereeError::TokenProgramNotSpl);
+            require!(is_supported_token_program(key_at(d, OFF_TOKEN_PROGRAM_B)), RefereeError::TokenProgramNotSpl);
             require_eq!(u64_at(d, OFF_AMOUNT_A), amount_a, RefereeError::AmountMismatch);
             require_eq!(u64_at(d, OFF_AMOUNT_B), amount_b, RefereeError::AmountMismatch);
             require!(i64_at(d, OFF_EXPIRY) > now, RefereeError::RecordExpired);
@@ -460,7 +466,7 @@ pub enum RefereeError {
     PartyMismatch,
     #[msg("The two parties must be different")]
     SameParty,
-    #[msg("Only classic SPL Token legs are supported")]
+    #[msg("Only classic SPL Token or Token-2022 legs are supported")]
     TokenProgramNotSpl,
     #[msg("The signed amounts do not match the trade record")]
     AmountMismatch,

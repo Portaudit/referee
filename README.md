@@ -50,4 +50,4 @@ The boundary I held:
 
 Account checks (PDA seeds and bumps, `has_one` on the issuer, signer requirements, and owner and key comparisons on the DvP record) are in `program/programs/referee_stub/src/lib.rs`.
 
-AI drafted a lot, but it could not have run a single transaction itself.
+AI drafted a lot, but I ran every transaction in the receipts myself.

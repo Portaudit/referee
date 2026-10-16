@@ -23,7 +23,7 @@ Evidence, all on devnet and listed in `docs/RECEIPTS.md` and on the replay page:
 ## What the pattern needs
 
 1. **The trade must name the PDA when it is created.** The authority is stored in the DvP record (a 458-byte account, authority at offset 129). It cannot be changed afterwards, so the parties choose Referee's PDA up front.
-2. **A registration step.** The DvP record cannot carry Referee's own state, so both parties co-sign a registration (`trade` account, seeds `["trade", swap_dvp]`). `register_trade` checks that the record is owned by DvP, has the right size, names the PDA, matches the parties, has distinct signers, uses classic SPL token programs, has matching amounts, has not expired, and does not redirect destinations.
+2. **A registration step.** The DvP record cannot carry Referee's own state, so both parties co-sign a registration (`trade` account, seeds `["trade", swap_dvp]`). `register_trade` checks that the record is owned by DvP, has the right size, names the PDA, matches the parties, has distinct signers, uses the classic SPL Token or Token-2022 program, has matching amounts, has not expired, and does not redirect destinations.
 3. **Credentials as the gate.** In the demo, an issuer key writes a per-party `credential` account (seeds `["cred", subject]`). `settle` requires both credentials to be valid, unexpired and eligible.
 4. **A fixed account order.** `settle` takes the DvP accounts as remaining accounts with the DvP program last, and builds the CPI from them.
 5. **Rent handling.** DvP's Settle sweeps all rent from the record and escrows to the authority, which here is the PDA. `settle` forwards that amount, and the trade-registration rent, to the `refund_to` address both parties signed. Early test trades before this was added left about 0.0119 SOL in the PDA, and no instruction withdraws it.
@@ -32,7 +32,7 @@ Evidence, all on devnet and listed in `docs/RECEIPTS.md` and on the replay page:
 
 - DvP's own upgrade authority is a trust assumption. Referee does not change who can upgrade DvP.
 - The demo issuer is the author's own keypair. Credentials are a demonstration, not KYC. Verifex, a separate program, now issues the credentials by cross-program call (verifex.live). It is also unaudited and upgradeable by the author's wallet.
-- Only classic SPL token legs are supported, enforced in `register_trade`.
+- Only classic SPL and plain Token-2022 mints are supported, enforced in `register_trade`. Token-2022 mint extensions (transfer hooks, token fees) are not checked.
 - The creator still pays fees and the DvP nonce account rent.
 - Unaudited. The deployed binary's hash is published, but rebuilding it on another machine has not been verified.
 
@@ -44,4 +44,4 @@ Evidence, all on devnet and listed in `docs/RECEIPTS.md` and on the replay page:
 
 ## Next
 
-Token-2022 legs, fees, a production credential issuer, a reproducible-build check, and an independent audit.
+Token-2022 mint extensions, Referee fees (flat or in basis points), a production credential issuer, a reproducible-build check, and an independent audit.

@@ -48,6 +48,7 @@ print("rows not in the ledger (DvP-only transactions are expected here): " + (",
 TEMPLATE = r'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Referee: replay of real devnet transactions</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NiA1NiI+PHJlY3Qgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iMTIiIGZpbGw9IiNmMmE5M2IiLz48dGV4dCB4PSIyOCIgeT0iMzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwZjE0MTkiIGZvbnQtZmFtaWx5PSJ1aS1zYW5zLXNlcmlmLHN5c3RlbS11aSxIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiI+UmU8L3RleHQ+PHJlY3QgeD0iMTIiIHk9IjQzIiB3aWR0aD0iMzIiIGhlaWdodD0iMyIgZmlsbD0iIzBmMTQxOSIvPjwvc3ZnPg==">
 <style>
 :root{--bg:#0b0f14;--card:#121923;--line:#223042;--text:#e6edf3;--mute:#8b9bb0;--ok:#3ddc97;--bad:#ff6b6b;--acc:#7aa2ff;--acc2:#b58cff}
 *{box-sizing:border-box}
@@ -88,7 +89,7 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 @media (max-width:700px){td:nth-child(4),th:nth-child(4){display:none}}
 </style></head><body>
 <header>
-<h1>Referee</h1>
+<h1 style="display:flex;align-items:center;justify-content:space-between">Referee<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NiA1NiI+PHJlY3Qgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iMTIiIGZpbGw9IiNmMmE5M2IiLz48dGV4dCB4PSIyOCIgeT0iMzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwZjE0MTkiIGZvbnQtZmFtaWx5PSJ1aS1zYW5zLXNlcmlmLHN5c3RlbS11aSxIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiI+UmU8L3RleHQ+PHJlY3QgeD0iMTIiIHk9IjQzIiB3aWR0aD0iMzIiIGhlaWdodD0iMyIgZmlsbD0iIzBmMTQxOSIvPjwvc3ZnPg==" alt="Referee mark" style="height:1.3em;width:1.3em;margin:0;border-radius:0"></h1>
 <div class="sub">An independent settlement authority for Solana DvP trades. Built by Ishvir Jackpersad.</div>
 <div class="banner"><b>This is a replay</b> of transactions recorded on Solana devnet on 14 and 15 October 2026 (UTC). Nothing here is live. Every row carries a signature you can check yourself with <code>solana confirm -v &lt;signature&gt; --url devnet</code>. Unaudited. Independent project, not affiliated with or endorsed by the Solana Foundation or J.P. Morgan.</div>
 </header>

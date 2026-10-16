@@ -144,7 +144,7 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 <div id="timeline"></div>
 </div>
 </main>
-<footer>Generated from docs/RECEIPTS.md and an on-chain ledger of the program's transactions (built __BUILT__). Source: github.com/Portaudit/referee</footer>
+<footer>Generated from docs/RECEIPTS.md and an on-chain ledger of the program's transactions (built __BUILT__). Source: <a href="https://github.com/Portaudit/referee" target="_blank" rel="noopener noreferrer">github.com/Portaudit/referee</a> &middot; <a href="https://github.com/Portaudit/referee#how-this-was-built" target="_blank" rel="noopener noreferrer">How this was built</a></footer>
 <script>
 const D=__DATA__;
 const scenes=D.scenes,led={};

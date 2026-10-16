@@ -31,7 +31,7 @@ Evidence, all on devnet and listed in `docs/RECEIPTS.md` and on the replay page:
 ## What it does not solve
 
 - DvP's own upgrade authority is a trust assumption. Referee does not change who can upgrade DvP.
-- The demo issuer is the author's own keypair. Credentials are a demonstration, not KYC.
+- The demo issuer is the author's own keypair. Credentials are a demonstration, not KYC. Verifex, a separate program, now issues the credentials by cross-program call (verifex.live). It is also unaudited and upgradeable by the author's wallet.
 - Only classic SPL token legs are supported, enforced in `register_trade`.
 - The creator still pays fees and the DvP nonce account rent.
 - Unaudited. The deployed binary's hash is published, but rebuilding it on another machine has not been verified.

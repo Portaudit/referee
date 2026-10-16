@@ -3,3 +3,9 @@ node_modules/
 *.keypair.json
 *-keypair.json
 target/
+sandbox-keys/
+*exec.json
+*.env
+stage-*.sh
+stage-*.log
+rewrite-msgs.sh

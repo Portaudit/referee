@@ -1,5 +1,7 @@
 # REFEREE
 
+[![Verified on devnet](https://img.shields.io/badge/Verified-on%20devnet-success)](docs/RECEIPTS.md)
+
 An independent settlement authority for Solana DvP trades. Work in progress.
 
 Independent project built on Solana DvP. Not affiliated with or endorsed by the Solana Foundation or J.P. Morgan.
@@ -32,3 +34,20 @@ Limits: the demo issuer is a keypair controlled by the project author, so creden
 ## Licence
 
 This project's own code is licensed under Apache-2.0 (see `LICENSE` and `NOTICE`). The code in `dvp/` is MIT-licensed.
+
+## How this was built
+
+Built with AI assistance for drafting code, documentation and scripts. I used Claude, Meta AI, and Hermes (an agent in my own WSL, running an NVIDIA Nemotron model via OpenRouter), plus a single question to ChatGPT. I made the design decisions, ran everything on devnet, and checked each claim against the chain myself.
+
+What was mine: I chose DvP and the PDA-as-authority idea, and I decided what counted as proof: nothing goes in the deck without a signature. I pushed to put the limits on a slide before anyone asked, and I noticed the deck under-sold TrustRail Core. I ran every command on devnet and pasted the real output, including the failures, and several of the best decisions came from that.
+
+The boundary I held:
+- AI was used for velocity: drafting programs, scripts and documentation.
+- Signing keys stayed in local keypair files that are not in this repository, and no seed phrase or signing keypair was ever pasted into an AI chat.
+- As of commit ee02f2b, I scanned this repository's git history for key material and found none (`scripts/keyscan.py`).
+- Where an AI draft and the chain disagreed, the chain decided.
+- Every result in the deck points to a transaction signature. Limits are stated as limits, not as results.
+
+Account checks (PDA seeds and bumps, `has_one` on the issuer, signer requirements, and owner and key comparisons on the DvP record) are in `program/programs/referee_stub/src/lib.rs`.
+
+AI drafted a lot, but it could not have run a single transaction itself.

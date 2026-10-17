@@ -1,0 +1,13 @@
+# Gitleaks false positives, reviewed 2026-10-17.
+# Each entry is the constant EXPECTED_AUTH in a script: the public address of Referee's
+# authority PDA, shown on the replay page. It is an address, not a key.
+520d2585936b1c9211ec30475c80cfa061fa4f3a:scripts/referee22.ts:generic-api-key:59
+5d9cad1afda94ec99f180b484e40f95c46e77dfb:scripts/referee.ts:generic-api-key:59
+953866f2393755f5a8b5500de61031ca5946ae13:scripts/referee-vx.ts:generic-api-key:59
+953866f2393755f5a8b5500de61031ca5946ae13:scripts/verifex.ts:generic-api-key:59
+aabe10b2306d382189b393d4f26f218fc232211c:scripts/referee-vx.ts:generic-api-key:59
+aabe10b2306d382189b393d4f26f218fc232211c:scripts/verifex.ts:generic-api-key:59
+c35b91085d72bbbfa4a698a602271498e2e76a18:scripts/referee-core.ts:generic-api-key:59
+c35b91085d72bbbfa4a698a602271498e2e76a18:scripts/verifex-core.ts:generic-api-key:60
+febecac4120dcf9b2afaca4e36ab61960415f45c:scripts/referee-core.ts:generic-api-key:59
+febecac4120dcf9b2afaca4e36ab61960415f45c:scripts/verifex-core.ts:generic-api-key:60

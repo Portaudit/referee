@@ -18,7 +18,7 @@ Evidence, all on devnet and listed in `docs/RECEIPTS.md` and on the replay page:
 
 - A stub program's PDA settled a funded DvP trade (first proof).
 - The full program then settled registered trades, refused unregistered ones (error 3012), refused a revoked credential (6012), and refused closing a registration while the DvP trade was open (6016).
-- A fresh key as the only signer and fee payer settled trade 1010, and a keeper script found and settled trade 1011.
+- A wallet with no role in the trade, as the only signer and fee payer, settled trade 1010, and a keeper script found and settled trade 1011.
 
 ## What the pattern needs
 

@@ -125,7 +125,7 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 <li><a href="#" data-go="core claim">A program-derived address can be the settlement authority of a Solana Foundation DvP trade, and it settled one on devnet.</a></li>
 <li><a href="#" data-go="refusals">Unregistered trades, revoked credentials and early close attempts are refused on chain.</a></li>
 <li><a href="#" data-go="registered">Registered, credentialed trades settle, and the rent DvP sweeps is returned to the address the parties chose.</a></li>
-<li><a href="#" data-go="anyone">Anyone can trigger settlement: a fresh key did, and a keeper script found a trade by itself.</a></li>
+<li><a href="#" data-go="anyone">Anyone can trigger settlement: a wallet with no role in the trade did, and a keeper script found a trade by itself.</a></li>
 <li><a href="#" data-go="unwinding">A rejected trade's registration can be closed and its rent returned.</a></li>
 <li><a href="#" data-go="token-2022">Plain Token-2022 trades settle too: DvP alone settled one, then a Referee-gated one. Mint extensions are not checked.</a></li>
 <li><a href="#" data-go="verifex">A program can be the credential issuer: a minimal Verifex checked one thing and issued credentials by CPI, and a refused agent got none. It does not yet bind the program to the subject.</a></li>

@@ -54,7 +54,7 @@ It ran on 14 and 15 October 2026 (UTC) against the Solana Foundation's DvP progr
 
 | Scene | Signature |
 |---|---|
-| Trade 1010 settled with a fresh key as the only signer and fee payer (`H2rEU3uLgNPqZcAFwZ6WbyxR51uq9n6dk3ReWMxvDdg5`) | `5i15Zt2RC69h7nApeu6NcT1vBsWK46JnQaLkUVTFmhr4nbU8ELDG7MgXu1PNyUX7VVHPyk9VJzzBwjJmbdGaUJTK` |
+| Trade 1010 settled by a wallet with no role in the trade, as the only signer and fee payer (`H2rEU3uLgNPqZcAFwZ6WbyxR51uq9n6dk3ReWMxvDdg5`) | `5i15Zt2RC69h7nApeu6NcT1vBsWK46JnQaLkUVTFmhr4nbU8ELDG7MgXu1PNyUX7VVHPyk9VJzzBwjJmbdGaUJTK` |
 | Trade 1011 settled by the keeper script, which found the trade by itself | `3QvEpzWQxhSQoZ3aQu93ryFVb7eiXEiKKSixBqMa6PELeArh46Un61oZM5Am5WjW2nAW9xS9gNJAJqi7jai5huwR` |
 
 ## Unwinding a trade

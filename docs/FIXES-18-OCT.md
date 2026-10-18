@@ -52,12 +52,13 @@ DvP 1021 expired unsettled at about 05:49 UTC, one hour after it was created. I 
 - The admin key is hard-coded in the program.
 - Verifex's base path does not bind the presented agent program to the credential's subject. Its credentials last seven days and cannot be renewed by Verifex.
 - The build hash has not been reproduced on another machine.
-- The devnet DvP deployment was last deployed at slot 479376863. I have not verified that it contains every fix in the audited source.
+- The devnet DvP deployment was last deployed at slot 479376863. It refuses nonce reuse (see above), which is one of the audit's fixes, but I have not checked it against every fix in the audited source.
 
 ## Checked and found correct
 
 - **Record layout.** `scripts/check-layout.py` parses DvP's serializer (`to_bytes` in `state/swap_dvp.rs`, source commit df9919e) and Referee's offset constants. All 11 offsets Referee reads match, and the record length matches at 458 bytes. Run on 18 October 2026: ALL MATCH. This checks the source I cloned, not the deployed binary. The trades registered and settled on devnet that day exercised the deployed layout.
 - **Settle window.** The 600-second minimum is the value Cantina recommended for DvP in finding 3.3.11, which the report marks acknowledged. I did not find the check in the DvP source I cloned. Referee's check is stricter: it measures from the later of now and the earliest settlement time, and it also applies when no earliest time is set.
+- **Nonce reuse.** On the devnet DvP, re-creating a closed DvP (nonce 1021) is refused with `NonceAlreadyUsed` (error 13; a simulation, so it has no signature). That is the behaviour of the nonce-tombstone fix for Cantina's finding 3.1.4, so the deployed program includes at least that fix.
 
 ## DvP baseline, taken 2026-10-18T05:32:13Z
 

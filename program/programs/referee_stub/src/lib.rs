@@ -35,8 +35,8 @@ pub const TRADE_SEED: &[u8] = b"trade";
 pub const FLAG_ELIGIBLE: u8 = 1;
 
 // DvP SwapDvp record layout (458 bytes). Offsets 1 to 257 and 449 were confirmed against a real
-// devnet account. The destination offsets (321, 353) are derived from the source and still need
-// confirming against a real record.
+// devnet account. The destination offsets (321, 353) were confirmed on 18 Oct 2026 against real
+// devnet records (an all-zero destination read back at 321, a user address at 353).
 pub const DVP_RECORD_LEN: usize = 458;
 const OFF_USER_A: usize = 1;
 const OFF_USER_B: usize = 33;
@@ -48,6 +48,10 @@ const OFF_AMOUNT_B: usize = 233;
 const OFF_EXPIRY: usize = 241;
 const OFF_DEST_A: usize = 321;
 const OFF_DEST_B: usize = 353;
+/// Option tag of earliest_settlement_timestamp (1 = set); the i64 follows at +1.
+const OFF_EARLIEST_TAG: usize = 449;
+/// The settle window must be at least this long once any earliest time has passed.
+const MIN_SETTLE_WINDOW_SECS: i64 = 600;
 
 fn key_at(d: &[u8], o: usize) -> Pubkey {
     let mut b = [0u8; 32];
@@ -115,11 +119,12 @@ pub mod referee_stub {
         Ok(())
     }
 
-    /// The issuer changes the flags or expiry of an existing credential (revoke or renew).
+    /// The issuer changes the flags or expiry of an existing credential (revoke or renew) and re-binds it to the current issuer.
     pub fn set_credential(ctx: Context<SetCredential>, flags: u8, expires_at: i64) -> Result<()> {
         let c = &mut ctx.accounts.credential;
         c.flags = flags;
         c.expires_at = expires_at;
+        c.issuer = ctx.accounts.issuer.key();
         emit!(CredentialSet {
             subject: c.subject,
             issuer: ctx.accounts.issuer.key(),
@@ -138,6 +143,7 @@ pub mod referee_stub {
         refund_to: Pubkey,
     ) -> Result<()> {
         let now = Clock::get()?.unix_timestamp;
+        require!(refund_to != Pubkey::default(), RefereeError::RefundToInvalid);
         let authority = ctx.accounts.authority_pda.key();
         let signer_a = ctx.accounts.user_a.key();
         let signer_b = ctx.accounts.user_b.key();
@@ -157,10 +163,13 @@ pub mod referee_stub {
             require!(is_supported_token_program(key_at(d, OFF_TOKEN_PROGRAM_B)), RefereeError::TokenProgramNotSpl);
             require_eq!(u64_at(d, OFF_AMOUNT_A), amount_a, RefereeError::AmountMismatch);
             require_eq!(u64_at(d, OFF_AMOUNT_B), amount_b, RefereeError::AmountMismatch);
-            require!(i64_at(d, OFF_EXPIRY) > now, RefereeError::RecordExpired);
-            // Proceeds must go to the parties themselves (assumed encoding of "no redirect").
-            require!(key_at(d, OFF_DEST_A) == signer_a || key_at(d, OFF_DEST_A) == Pubkey::default(), RefereeError::DestinationRedirected);
-            require!(key_at(d, OFF_DEST_B) == signer_b || key_at(d, OFF_DEST_B) == Pubkey::default(), RefereeError::DestinationRedirected);
+            let expiry = i64_at(d, OFF_EXPIRY);
+            require!(expiry > now, RefereeError::RecordExpired);
+            let start = if d[OFF_EARLIEST_TAG] == 1 { now.max(i64_at(d, OFF_EARLIEST_TAG + 1)) } else { now };
+            require!(expiry.saturating_sub(start) >= MIN_SETTLE_WINDOW_SECS, RefereeError::WindowTooShort);
+            // Proceeds must go to the parties themselves (an all-zero destination is refused).
+            require!(key_at(d, OFF_DEST_A) == signer_a, RefereeError::DestinationRedirected);
+            require!(key_at(d, OFF_DEST_B) == signer_b, RefereeError::DestinationRedirected);
         }
 
         let t = &mut ctx.accounts.trade;
@@ -500,4 +509,8 @@ pub enum RefereeError {
     WrongDvpProgram,
     #[msg("The DvP trade record still exists; settle it or reject it first")]
     TradeStillOpen,
+    #[msg("refund_to must not be the all-zero address")]
+    RefundToInvalid,
+    #[msg("The settle window is shorter than the minimum")]
+    WindowTooShort,
 }

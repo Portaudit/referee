@@ -1,5 +1,7 @@
 # Receipts
 
+The 18 October 2026 fixes and their tests are in `FIXES-18-OCT.md`. They are not counted in this file or on the replay page.
+
 Every claim in this repository's README maps to a transaction on Solana devnet. Nothing here is mocked. Check any row with:
 
 `solana confirm -v <signature> --url devnet`

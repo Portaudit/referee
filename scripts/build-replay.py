@@ -148,7 +148,7 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 <li>Wallets: the 56 receipts in docs/RECEIPTS.md were signed by 14 distinct addresses, three of which are program addresses. Each holds 0 SOL on mainnet.</li>
 <li>Receipts against the chain: the ledger of calls to Referee holds 43 transactions. 37 are receipts and 6 appear on this page only. The other 19 receipts do not call Referee.</li>
 <li>Program funds: the authority address (a program-derived address) held 0.01190752 SOL on devnet when I checked. No instruction withdraws it. The only transfer out is the rent refund during settle.</li>
-<li>Upgrades: the program is upgradeable by my wallet and has had five in-place upgrades, each listed in the receipts.</li>
+<li>Upgrades: the program is upgradeable by my wallet and has had seven in-place upgrades: five are listed in the receipts and two are in docs/FIXES-18-OCT.md.</li>
 </ul>
 <p>Full statement and how to repeat it: <a href="https://ishvir.xyz/security/" target="_blank" rel="noopener noreferrer">ishvir.xyz/security</a>.</p>
 <h2>Full timeline</h2>

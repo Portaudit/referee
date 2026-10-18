@@ -37,19 +37,27 @@ After each upgrade I dumped the live program data. Its first bytes matched the b
 | `set_credential` for party B, re-binding it to the current issuer | `xitXz7kNx18EL1KkcQYBNv6MS8iJBJiqdwAjpCCinaqkBpN7z2Q5QR4X9NBSyfJFU2usEzb57PaXthpT7Wiv4AM` |
 | Settle DvP 1022 after the renewal | `58a3e7BhhhvWp48ew6vHw86fRG7eUGyw7h2sTsDrxYMhSM4v4dTgCP5roQ5dvuz2i2byUzpG3xAs58CnAQidbFjT` |
 | Issuer set back to the Verifex PDA | `31stmKaf2K2BtXMABjarN5FbyrHaEhxUchVEvVvFtRGj1sQaPzzpn3rXqvHS7Ref6xSPfXvJeUPyjBuGLLJ6Jy6n` |
+| DvP 1021 reject, after it expired (Reject has no expiry check) | `4jiWjMPyXmpsdLXRxmumKBh5TjP5a7SGvWusPJQ8pJyYxxf27vX7w3tCjFUdWvkTfgWXGAk5aZ2qSPda1vHuo82X` |
+| Referee `close_trade` on 1021, on the seventh-upgrade build | `4snZFVjhtjEqerzPEy6qZf4SsiKgjG1KhTFh4Qkk8WUUzJ1YfpN5urhej6Eogkn3DvczfXvZkNG3gwYNgqy3fkwk` |
 
-DvP 1021 is registered and funded and was not settled. After the renewal test, the credentials of parties A and B are bound to the key I used for the test, so they are not valid under the Verifex issuer.
+DvP 1021 expired unsettled at about 05:49 UTC, one hour after it was created. I then rejected it and closed Referee's trade record, which also ran `close_trade` on the upgraded build. After the renewal test, the credentials of parties A and B are bound to the key I used for the test, so they are not valid under the Verifex issuer.
 
 ## What I did not fix
 
-- Inherited from DvP, acknowledged in the Cantina review: mint authorities can freeze or claw back escrow, dust can delay a settle, hook mints cannot settle through Referee, and closeable mints can change behaviour after creation.
-- DvP itself still accepts an explicit all-zero destination. Referee no longer does.
+- Inherited from DvP and acknowledged in the Cantina report (findings 3.3.2, 3.2.3 and 3.3.1): mint authorities can freeze or claw back escrow, dust can delay a settle, and closeable mints can change behaviour after creation. Referee does not change how tokens move and adds no mint policy of its own: refusing every mint with a freeze authority would also rule out stablecoins such as USDC, so I disclose it instead.
+- Referee's own scope: its settle passes no transfer-hook extra accounts, so mints whose hook needs extra accounts cannot settle through Referee, although DvP supports them.
+- DvP lets a creator choose any settlement destination, including an all-zero address. Referee now requires each destination to be the party's own address.
 - Referee reads DvP records by fixed offsets for a 458-byte layout. If the length changes it refuses, which is safe. A change that keeps the length but moves fields would not be caught.
 - Expiries use cluster time, which lags wall-clock time by roughly 10 to 30 seconds.
 - The admin key is hard-coded in the program.
 - Verifex's base path does not bind the presented agent program to the credential's subject. Its credentials last seven days and cannot be renewed by Verifex.
 - The build hash has not been reproduced on another machine.
 - The devnet DvP deployment was last deployed at slot 479376863. I have not verified that it contains every fix in the audited source.
+
+## Checked and found correct
+
+- **Record layout.** `scripts/check-layout.py` parses DvP's serializer (`to_bytes` in `state/swap_dvp.rs`, source commit df9919e) and Referee's offset constants. All 11 offsets Referee reads match, and the record length matches at 458 bytes. Run on 18 October 2026: ALL MATCH. This checks the source I cloned, not the deployed binary. The trades registered and settled on devnet that day exercised the deployed layout.
+- **Settle window.** The 600-second minimum is the value Cantina recommended for DvP in finding 3.3.11, which the report marks acknowledged. I did not find the check in the DvP source I cloned. Referee's check is stricter: it measures from the later of now and the earliest settlement time, and it also applies when no earliest time is set.
 
 ## DvP baseline, taken 2026-10-18T05:32:13Z
 

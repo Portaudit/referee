@@ -73,6 +73,11 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 </svg>
 </div>
 <div class="card">
+<div class="tabs" id="tabs"></div>
+<div id="scene"></div>
+<button class="play" id="play">Play this scene</button>
+</div>
+<div class="card">
 <h2>What these transactions prove</h2>
 <ul class="claims">
 <li><a href="#" data-go="core claim">A program-derived address can be the settlement authority of a Solana Foundation DvP trade, and it settled one on devnet.</a></li>
@@ -87,17 +92,12 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 <div class="mutd">Devnet only, unaudited. Credentials are a demonstration, not KYC: the issuer is the author's demo key or the minimal Verifex program.</div>
 </div>
 <div class="card">
-<div class="tabs" id="tabs"></div>
-<div id="scene"></div>
-<button class="play" id="play">Play this scene</button>
-</div>
-<div class="card">
 <h2>Security checks</h2>
 <p>Checked on 17 October 2026. These are point-in-time checks of the patterns and addresses named, not proof that nothing sensitive exists. The programs are devnet and unaudited.</p>
 <ul>
 <li>Key scan: the full git history of this repository was scanned with scripts/keyscan.py. It found no valid Solana keypair, private-key block or common token pattern. GitHub secret scanning also shows no alerts on this repository.</li>
 <li>Gitleaks v8.30.1, an independent scanner, reported 10 matches in this repository. All are one value: the public address of this program authority account (see Program funds below), assigned to the constant EXPECTED_AUTH in the scripts. They are listed in .gitleaksignore, and the full account of the check is at ishvir.xyz/security.</li>
-<li>Authorship: every commit is authored by my GitHub account, and the contributors page lists one contributor.</li>
+<li>Authorship: every commit is authored by my GitHub account, and the contributors graph lists one contributor.</li>
 <li>Wallets: the 56 receipts in docs/RECEIPTS.md were signed by 14 distinct addresses, three of which are program addresses. Each holds 0 SOL on mainnet.</li>
 <li>Receipts against the chain: the ledger of calls to Referee holds 43 transactions. 37 are receipts and 6 appear on this page only. The other 19 receipts do not call Referee.</li>
 <li>Program funds: the authority address (a program-derived address) held 0.01190752 SOL on devnet when I checked. No instruction withdraws it. The only transfer out is the rent refund during settle.</li>

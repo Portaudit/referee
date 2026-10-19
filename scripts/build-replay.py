@@ -154,6 +154,17 @@ footer{color:var(--mute);font-size:13px;padding-bottom:50px}
 <div class="mutd" id="tlnote"></div>
 <div id="timeline"></div>
 </div>
+<div class="card">
+<h2>Why Solana, why now?</h2>
+<p>Settlement comes down to who gets to say &ldquo;now&rdquo;. On Solana that can be a program, not a person.</p>
+<ul>
+<li><strong>A program can be the signer.</strong> A program-derived address has no private key, so nothing can sign for it except the program it was derived from. That is all of Referee: the DvP trade names that address as its settlement authority, and only Referee's code can use it.</li>
+<li><strong>Refusals are receipts.</strong> A refused settle still lands on chain, costs the 5,000-lamport fee and stays there for anyone to check: error 3012 for an unregistered trade, 6012 for a revoked credential. 56 devnet signatures, 6 refusals, all in the repo.</li>
+<li><strong>The settlement layer is public.</strong> The Solana Foundation's DvP program swaps two tokens atomically, and Cantina reviewed it in May 2026. I did not change a line of it. Referee sits beside it.</li>
+<li><strong>Why now.</strong> DvP is being built in the open: as of 19 October 2026 it has open pull requests for confidential settlement and Token-2022 mint extensions. A settlement authority that is a key somebody holds is the part I wanted to take out, and replacing it with rules is possible today. That is my read, not a claim about anyone's roadmap.</li>
+</ul>
+<div class="mutd">Devnet only, unaudited.</div>
+</div>
 </main>
 <footer><a href="https://github.com/Portaudit/referee/graphs/contributors?from=7%2F11%2F2026" target="_blank" rel="noopener noreferrer">Contributor stats</a><br>
 <a href="https://github.com/Portaudit/referee#how-this-was-built" target="_blank" rel="noopener noreferrer">How this was built</a><br>
